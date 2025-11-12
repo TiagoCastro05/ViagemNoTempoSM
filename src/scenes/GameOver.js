@@ -1,0 +1,283 @@
+export class GameOver extends Phaser.Scene {
+  constructor() {
+    super("GameOver");
+  }
+
+  init(data) {
+    // Recebe dados do jogo (nível alcançado, pontos, tempo, etc.)
+    this.level = data.level || 1;
+    this.score = data.score || 0;
+    this.timeElapsed = data.timeElapsed || 0;
+    this.timeTravels = data.timeTravels || 0;
+  }
+
+  preload() {
+    // Carregar assets se necessário
+  }
+
+  create() {
+    // Fundo escuro com efeito de game over
+    const graphics = this.add.graphics();
+    graphics.fillGradientStyle(0x0d0617, 0x0d0617, 0x1a0515, 0x1a0515, 1);
+    graphics.fillRect(0, 0, 1280, 720);
+
+    // Partículas de fundo para efeito visual
+    this.createBackgroundParticles();
+
+    // Título GAME OVER
+    const gameOverText = this.add
+      .text(640, 100, "GAME OVER", {
+        fontSize: "80px",
+        fontFamily: "Arial",
+        color: "#ff0000",
+        stroke: "#000000",
+        strokeThickness: 8,
+        shadow: {
+          offsetX: 4,
+          offsetY: 4,
+          color: "#000",
+          blur: 8,
+          fill: true,
+        },
+      })
+      .setOrigin(0.5)
+      .setAlpha(0);
+
+    // Animação de entrada do título
+    this.tweens.add({
+      targets: gameOverText,
+      alpha: 1,
+      scale: { from: 0.5, to: 1 },
+      duration: 1000,
+      ease: "Bounce.out",
+    });
+
+    // Efeito de pulsação
+    this.tweens.add({
+      targets: gameOverText,
+      scale: { from: 1, to: 1.1 },
+      duration: 1500,
+      ease: "Sine.inOut",
+      yoyo: true,
+      repeat: -1,
+      delay: 1000,
+    });
+
+    // Painel de resultados
+    this.createResultsPanel();
+
+    // Botões
+    this.createButtons();
+
+    // Mensagem motivacional
+    this.showMotivationalMessage();
+  }
+
+  createBackgroundParticles() {
+    // Criar algumas partículas flutuantes no fundo
+    for (let i = 0; i < 20; i++) {
+      const x = Phaser.Math.Between(0, 1280);
+      const y = Phaser.Math.Between(0, 720);
+      const size = Phaser.Math.Between(2, 6);
+
+      const particle = this.add.circle(x, y, size, 0x00ffff, 0.3);
+
+      this.tweens.add({
+        targets: particle,
+        y: y + Phaser.Math.Between(-100, 100),
+        x: x + Phaser.Math.Between(-50, 50),
+        alpha: { from: 0.1, to: 0.5 },
+        duration: Phaser.Math.Between(3000, 6000),
+        ease: "Sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+    }
+  }
+
+  createResultsPanel() {
+    // Painel com fundo semi-transparente
+    const panel = this.add.rectangle(640, 350, 600, 350, 0x1a0f2e, 0.9);
+    panel.setStrokeStyle(3, 0x00ffff);
+
+    // Título do painel
+    this.add
+      .text(640, 220, "RESULTADOS", {
+        fontSize: "40px",
+        fontFamily: "Arial",
+        color: "#00ffff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+
+    // Formatação do tempo
+    const minutes = Math.floor(this.timeElapsed / 60);
+    const seconds = this.timeElapsed % 60;
+    const timeFormatted = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+    // Resultados
+    const results = [
+      { label: "NÍVEL ALCANÇADO:", value: this.level, color: "#ffff00" },
+      { label: "Pontuação:", value: this.score, color: "#ffffff" },
+      { label: "Tempo decorrido:", value: timeFormatted, color: "#ffffff" },
+      { label: "Viagens no tempo:", value: this.timeTravels, color: "#00ffff" },
+    ];
+
+    let yPos = 280;
+    results.forEach((result) => {
+      // Label
+      this.add
+        .text(400, yPos, result.label, {
+          fontSize: result.label.includes("NÍVEL") ? "32px" : "24px",
+          fontFamily: "Arial",
+          color: "#aaaaaa",
+          fontStyle: result.label.includes("NÍVEL") ? "bold" : "normal",
+        })
+        .setOrigin(0, 0.5);
+
+      // Valor
+      this.add
+        .text(880, yPos, result.value.toString(), {
+          fontSize: result.label.includes("NÍVEL") ? "32px" : "24px",
+          fontFamily: "Arial",
+          color: result.color,
+          fontStyle: "bold",
+        })
+        .setOrigin(1, 0.5);
+
+      yPos += result.label.includes("NÍVEL") ? 60 : 45;
+    });
+  }
+
+  createButtons() {
+    const buttonY = 570;
+    const buttonSpacing = 250;
+
+    // Botão Jogar Novamente
+    this.createMenuButton(450, buttonY, "JOGAR NOVAMENTE", () =>
+      this.playAgain()
+    );
+
+    // Botão Menu Principal
+    this.createMenuButton(830, buttonY, "MENU PRINCIPAL", () =>
+      this.goToMainMenu()
+    );
+  }
+
+  createMenuButton(x, y, text, callback) {
+    // Fundo do botão
+    const button = this.add.rectangle(x, y, 330, 65, 0x2a1f4a);
+    button.setStrokeStyle(2, 0x00ffff);
+    button.setInteractive({ useHandCursor: true });
+
+    // Texto do botão
+    const buttonText = this.add
+      .text(x, y, text, {
+        fontSize: "24px",
+        fontFamily: "Arial",
+        color: "#ffffff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+
+    // Efeitos hover
+    button.on("pointerover", () => {
+      button.setFillStyle(0x3d2f5f);
+      button.setScale(1.05);
+      buttonText.setScale(1.05);
+
+      this.tweens.add({
+        targets: [button, buttonText],
+        scale: 1.05,
+        duration: 100,
+      });
+    });
+
+    button.on("pointerout", () => {
+      button.setFillStyle(0x2a1f4a);
+      button.setScale(1);
+      buttonText.setScale(1);
+    });
+
+    button.on("pointerdown", () => {
+      button.setFillStyle(0x1a0f2e);
+      button.setScale(0.98);
+      buttonText.setScale(0.98);
+    });
+
+    button.on("pointerup", () => {
+      button.setFillStyle(0x3d2f5f);
+      callback();
+    });
+
+    // Animação de entrada
+    button.setAlpha(0);
+    buttonText.setAlpha(0);
+
+    this.tweens.add({
+      targets: [button, buttonText],
+      alpha: 1,
+      duration: 500,
+      delay: 1500,
+      ease: "Power2",
+    });
+
+    return { button, buttonText };
+  }
+
+  showMotivationalMessage() {
+    const messages = [
+      "O tempo não espera por ninguém... Tente novamente!",
+      "Cada falha é uma oportunidade de aprender!",
+      "O passado pode revelar o caminho para o futuro!",
+      "Continue viajando... A saída está mais perto!",
+      "Nem todos os caminhos são visíveis no presente!",
+    ];
+
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+    const message = this.add
+      .text(640, 650, randomMessage, {
+        fontSize: "20px",
+        fontFamily: "Arial",
+        color: "#888888",
+        fontStyle: "italic",
+      })
+      .setOrigin(0.5)
+      .setAlpha(0);
+
+    this.tweens.add({
+      targets: message,
+      alpha: 0.8,
+      duration: 1000,
+      delay: 2000,
+      ease: "Power2",
+    });
+  }
+
+  playAgain() {
+    // Efeito de transição
+    this.cameras.main.fadeOut(500, 0, 0, 0);
+
+    this.time.delayedCall(500, () => {
+      // Reiniciar o jogo do início
+      // this.scene.start('Game');
+      console.log(
+        "Reiniciar jogo - A implementar quando a cena do jogo estiver pronta"
+      );
+    });
+  }
+
+  goToMainMenu() {
+    // Efeito de transição
+    this.cameras.main.fadeOut(500, 0, 0, 0);
+
+    this.time.delayedCall(500, () => {
+      this.scene.start("MainMenu");
+    });
+  }
+
+  update() {
+    // Animações contínuas se necessário
+  }
+}

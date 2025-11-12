@@ -1,0 +1,25 @@
+Sessão 1 – 12 de novembro de 2025
+
+Objetivo: Menu Inicial e GameOver
+
+Atividades realizadas:
+- Criação do menu inicial, com as opções:
+
+    -> "Inicial": Conta a história/objetivo do jogo.
+    -> "Instruções": Explica como se joga.
+    -> "Jogar": Inicia o Jogo.
+    -> "Testar Game Over": Para verificar como está o ecrã Game Over.
+
+Problemas:
+ 1) O metodo "clearScreen" não funcioanva. Quando clicava no "Inicial" ou "Instruções", o menu inicial não desaparecia e o texto ficava sobreposto, tornando muito dificil de ler.
+ 2) Ao voltar para o menu inicial na screen do Game Over, o background fica preto, invés do azul escuro
+
+Solução:
+ 1) Dar prioridade ao fundo com 'setDepth(-1)' para ficar sempre atrás e limpar só o que interessa. O clearScreen() agora remove tudo exceto o fundo.
+
+ Utilização de IA:
+- utilizei IA para criar os menus porque queria adiantar o relatório com o prototipo de baixa fidelidade (1 ou 2 ecrãs), porque na semana a seguir vou ter 2 testes 
+  e queria despachar-me com isso para ter mais tempo para estudar.
+
+Decisões:
+- Corrigir o problema 2 e fazer resto do jogo
