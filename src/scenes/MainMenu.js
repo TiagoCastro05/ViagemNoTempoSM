@@ -162,16 +162,15 @@ export class MainMenu extends Phaser.Scene {
 
     // Conteúdo informativo
     const infoText = [
-      "Você está preso em um edifício misterioso.",
+      "Estás preso em um edifício misterioso.",
       "",
-      "Para escapar, você precisará resolver puzzles",
-      "viajando entre o passado, presente e futuro.",
+      "Para escapar, tens de resolver puzzles",
+      "viajando entre o passado e presente.",
       "",
       "No passado, paredes ainda não foram construídas.",
-      "No futuro, elas podem estar destruídas.",
       "",
-      "Use essas diferenças temporais para encontrar",
-      "seu caminho e completar cada nível!",
+      "Use essas diferenças temporais para encontrares",
+      "o caminho e completar cada nível!",
       "",
       "Boa sorte, viajante do tempo...",
     ];
@@ -212,7 +211,7 @@ export class MainMenu extends Phaser.Scene {
     const instructions = [
       "COMO JOGAR:",
       "",
-      "• Use as SETAS ou WASD para mover o personagem",
+      "• Use as SETAS para mover o personagem",
       "",
       "• Pressione ESPAÇO para viajar no tempo",
       "",
