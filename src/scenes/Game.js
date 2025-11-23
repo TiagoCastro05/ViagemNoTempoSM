@@ -21,10 +21,8 @@ export class Game extends Phaser.Scene {
   }
 
   preload() {
-    // Carregar mapa Tiled (formato JSON)
     this.load.tilemapTiledJSON("map", "assets/mapa/mapas.json");
 
-    // Carregar TODOS os tilesets definidos no JSON (os nomes devem corresponder exatamente)
     this.load.image("passado", "assets/mapa/Passado/tileset.png");
     this.load.image(
       "Futuro_paredes",
@@ -39,7 +37,6 @@ export class Game extends Phaser.Scene {
       "assets/mapa/Futuro/futuro/SpriteSheet_A_16x16_VerzatileDev.png"
     );
 
-    // Carregar spritesheet da chave (16x16, 20 colunas)
     this.load.spritesheet(
       "chave_sheet",
       "assets/mapa/chave/icon_sheet_16x16.png",
@@ -49,30 +46,17 @@ export class Game extends Phaser.Scene {
       }
     );
 
-    // Carregar personagem (spritesheet)
     this.load.spritesheet("player_walk", "assets/personagem/RPG_assets.png", {
       frameWidth: 16,
       frameHeight: 16,
     });
-
-    this.load.on("filecomplete-spritesheet-player_walk", () => {
-      console.log("✅ player_walk carregado com sucesso!");
-    });
-
-    this.load.on("loaderror", (file) => {
-      console.error("❌ Erro ao carregar arquivo:", file.src);
-    });
-
-    console.log("Preload: Assets do personagem carregados");
   }
 
   create() {
-    // Resetar estado do jogo
     this.keysCollected = 0;
     this.isDead = false;
     this.startTime = Date.now();
 
-    // Criar o mapa
     try {
       this.map = this.add.tilemap("map");
     } catch (error) {
@@ -81,7 +65,6 @@ export class Game extends Phaser.Scene {
       return;
     }
 
-    // Verificar se o mapa foi carregado
     if (!this.map || !this.map.tilesets || this.map.tilesets.length === 0) {
       console.error("Mapa não tem tilesets definidos corretamente");
       this.createFallbackGame();
@@ -89,17 +72,6 @@ export class Game extends Phaser.Scene {
     }
 
     // Adicionar tilesets
-    // Tentar adicionar usando diferentes nomes possíveis
-    let tilesetPassado = null;
-    let tilesetFuturo = null;
-
-    // Listar tilesets disponíveis no mapa
-    console.log(
-      "Tilesets no mapa:",
-      this.map.tilesets.map((ts) => ts.name)
-    );
-
-    // Adicionar TODOS os tilesets com os nomes exatos do JSON
     const tilesets = [];
     try {
       tilesets.push(this.map.addTilesetImage("passado", "passado"));
@@ -140,44 +112,39 @@ export class Game extends Phaser.Scene {
       console.error("❌ Erro ao carregar tileset 'chave':", e);
     }
 
-    // Verificar se pelo menos os tilesets principais foram carregados
-    tilesetPassado = tilesets[0]; // passado
-    tilesetFuturo = tilesets[1]; // Futuro_paredes
+    const tilesetPassado = tilesets[0];
+    const tilesetFuturo = tilesets[1];
 
-    // Se não conseguir carregar tilesets principais, usar fallback
     if (!tilesetPassado || !tilesetFuturo) {
       console.error("Não foi possível carregar os tilesets principais");
       this.createFallbackGame();
       return;
     }
 
-    // Criar layers - PASSADO (pode usar múltiplos tilesets)
+    // Criar layers - Passado
     this.passadoBackground = this.map.createLayer("Passado BackGround", [
       tilesetPassado,
       ...tilesets,
     ]);
-    this.passadoBackground?.setDepth(0); // Background mais atrás
-
+    this.passadoBackground?.setDepth(0);
     this.passadoPrincipal = this.map.createLayer("Passado Principal", [
       tilesetPassado,
       ...tilesets,
     ]);
-    this.passadoPrincipal?.setDepth(10); // Camada principal no meio
+    this.passadoPrincipal?.setDepth(10);
 
-    // Criar layers - FUTURO (pode usar múltiplos tilesets)
+    // Criar layers - Futuro
     this.futuroBackground = this.map.createLayer("Futuro background", [
       tilesetFuturo,
       ...tilesets,
     ]);
-    this.futuroBackground?.setDepth(0); // Background mais atrás
-
+    this.futuroBackground?.setDepth(0);
     this.futuroPrincipal = this.map.createLayer("Futuro principal", [
       tilesetFuturo,
       ...tilesets,
     ]);
-    this.futuroPrincipal?.setDepth(10); // Camada principal no meio
+    this.futuroPrincipal?.setDepth(10);
 
-    // Continuar com o resto da criação
     this.setupGame();
   }
 
@@ -349,71 +316,30 @@ export class Game extends Phaser.Scene {
   }
 
   setupGame() {
-    // Inicialmente, mostrar apenas o passado
-    if (this.futuroBackground) this.futuroBackground.setVisible(false);
-    if (this.futuroPrincipal) this.futuroPrincipal.setVisible(false);
+    // Mostrar apenas o passado inicialmente
+    this.futuroBackground?.setVisible(false);
+    this.futuroPrincipal?.setVisible(false);
 
-    // Configurar colisões nas layers principais
+    // Configurar colisões por propriedade
     if (this.passadoPrincipal) {
-      // Limpar todas as colisões primeiro
       this.passadoPrincipal.setCollision([]);
-
-      // Configurar colisão apenas nos tijolos pretos (não no chão)
-      // Vamos usar setCollisionBetween para um range de tiles de parede
-      // Você precisa ajustar esses IDs para os tijolos pretos do seu tileset
       this.passadoPrincipal.setCollisionByProperty({ collides: true });
-
       console.log("Colisões configuradas para o passado");
     }
 
     if (this.futuroPrincipal) {
-      // Limpar todas as colisões primeiro
       this.futuroPrincipal.setCollision([]);
-
-      // Configurar colisão apenas nos tijolos pretos/paredes
       this.futuroPrincipal.setCollisionByProperty({ collides: true });
-
       console.log("Colisões configuradas para o futuro");
     }
 
-    // TESTE: Criar o jogador diretamente (sem classe) para debug
-    console.log("🎮 Iniciando criação do player...");
-
-    // Verificar se a textura existe ANTES de criar o sprite
-    if (!this.textures.exists("player_walk")) {
-      console.error("❌ ERRO CRÍTICO: Textura player_walk não existe!");
-      console.log("Texturas disponíveis:", this.textures.list);
-      return;
-    }
-
-    const walkTexture = this.textures.get("player_walk");
-    console.log("✅ Textura player_walk encontrada!");
-    console.log("   - Total de frames:", walkTexture.frameTotal);
-    console.log("   - Source image:", walkTexture.source[0].source.src);
-
-    // Usar frame 6 (down inicial)
+    // Criar o jogador
     this.player = this.physics.add.sprite(48, 48, "player_walk", 6);
-    console.log("✅ Sprite criado com frame 6!");
     this.player.setCollideWorldBounds(true);
     this.player.body.setSize(14, 14);
     this.player.body.setOffset(1, 1);
     this.player.setDepth(100);
-    this.player.setScale(1); // 16px * 1 = 16px (1 tile)
-
-    console.log("✅ Propriedades físicas configuradas!");
-
-    // Forçar visibilidade
-    this.player.setVisible(true);
-    this.player.setAlpha(1);
-    this.player.clearTint();
-    this.player.setOrigin(0.5, 0.5); // Garantir que a origem está no centro
-
-    // FORÇA A RENDERIZAÇÃO
-    this.children.bringToTop(this.player);
-
-    console.log("✅ Visibilidade forçada!");
-    console.log("   - Origin:", this.player.originX, this.player.originY);
-    console.log("   - Render:", this.player.willRender(this.cameras.main));
+    this.player.setScale(1);
 
     // Criar animações do player
     this.anims.create({
@@ -443,41 +369,6 @@ export class Game extends Phaser.Scene {
       repeat: -1,
     });
 
-    console.log("=== DEBUG DO PLAYER ===");
-    console.log("Posição:", this.player.x, this.player.y);
-    console.log("Texture key:", this.player.texture.key);
-    console.log("Frame atual:", this.player.frame.name);
-    console.log("Visible:", this.player.visible);
-    console.log("Alpha:", this.player.alpha);
-    console.log("Depth:", this.player.depth);
-    console.log("Scale:", this.player.scaleX, this.player.scaleY);
-    console.log("Tint:", this.player.tintTopLeft);
-    console.log(
-      "Display Width/Height:",
-      this.player.displayWidth,
-      this.player.displayHeight
-    );
-    console.log("World Position:", this.player.getCenter());
-    console.log("Camera zoom:", this.cameras.main.zoom);
-    console.log("Camera bounds:", this.cameras.main.getBounds());
-    console.log("========================");
-
-    // Verificar se a textura foi carregada corretamente
-    const texture = this.textures.get("player_walk");
-    console.log("Texture exists:", texture && texture.key);
-    console.log("Texture frames:", texture ? texture.frameTotal : "N/A");
-
-    // DEBUG: Adicionar um retângulo azul para comparação de tamanho
-    this.debugRect = this.add.rectangle(
-      this.player.x,
-      this.player.y,
-      32,
-      32,
-      0x0000ff,
-      0.3 // Mais transparente para não cobrir o sprite
-    );
-    this.debugRect.setDepth(98); // ABAIXO do player agora!
-
     // Configurar câmera
     this.cameras.main.startFollow(this.player);
     this.cameras.main.setZoom(2);
@@ -504,7 +395,6 @@ export class Game extends Phaser.Scene {
       this.futuroCollider.active = false; // Inativo no início
     }
 
-    // Inicializar TimeTravelManager
     this.timeTravelManager = new TimeTravelManager(this);
     this.timeTravelManager.setLayers(
       this.passadoBackground,
@@ -513,11 +403,9 @@ export class Game extends Phaser.Scene {
       this.futuroPrincipal
     );
 
-    // Inicializar KeyManager
     this.keyManager = new KeyManager(this, this.map);
     this.keyManager.spawnKeys(this.timeTravelManager.getCurrentTime());
 
-    // Configurar coleta de chaves
     this.physics.add.overlap(
       this.player,
       this.keyManager.getGroup(),
@@ -526,14 +414,8 @@ export class Game extends Phaser.Scene {
       this
     );
 
-    // Configurar controles
     this.setupControls();
-
-    // UI
     this.createUI();
-
-    // Debug desativado - colisões configuradas
-    // Para reativar, descomente as linhas abaixo
     /*
     this.debugGraphicsObj = this.add.graphics();
     this.debugGraphicsObj.setDepth(1000);
@@ -556,15 +438,10 @@ export class Game extends Phaser.Scene {
     this.keySpace = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
     );
-
-    // Evento de viagem no tempo (só se tiver mapa)
-    if (this.map) {
-      this.keySpace.on("down", () => this.timeTravel());
-    }
+    if (this.map) this.keySpace.on("down", () => this.timeTravel());
   }
 
   createAnimations() {
-    // Walk
     this.anims.create({
       key: "walk",
       frames: this.anims.generateFrameNumbers("player_walk", {
@@ -574,25 +451,17 @@ export class Game extends Phaser.Scene {
       frameRate: 10,
       repeat: -1,
     });
-
     this.player.play("walk");
   }
 
   spawnKeys() {
-    // Limpar chaves existentes
     this.keysGroup.clear(true, true);
-
-    // Se a chave já foi definida (não é o primeiro spawn), usar os valores salvos
     let keyTimeToUse = this.keyTime;
     let keyPosToUse = this.keyPosition;
 
-    // Se é a primeira vez (início do jogo), escolher aleatoriamente
     if (!keyTimeToUse || !keyPosToUse) {
-      // Escolher aleatoriamente entre passado e futuro
       const randomTime = Phaser.Math.Between(0, 1) === 0 ? "passado" : "futuro";
       this.keyTime = randomTime;
-
-      // Obter spawn points do tempo escolhido
       const objectLayerName =
         randomTime === "passado" ? "chaves passado" : "chaves futuro";
       const objectLayer = this.map.getObjectLayer(objectLayerName);
@@ -604,7 +473,6 @@ export class Game extends Phaser.Scene {
         return;
       }
 
-      // Coletar todos os spawn points válidos
       const validSpawnPoints = [];
       objectLayer.objects.forEach((obj) => {
         if (obj.type === "item" || obj.name.includes("spawn_key")) {
@@ -617,7 +485,6 @@ export class Game extends Phaser.Scene {
         return;
       }
 
-      // Selecionar aleatoriamente 1 spawn point
       const randomIndex = Phaser.Math.Between(0, validSpawnPoints.length - 1);
       const selectedSpawn = validSpawnPoints[randomIndex];
       this.keyPosition = { x: selectedSpawn.x, y: selectedSpawn.y };
@@ -630,7 +497,6 @@ export class Game extends Phaser.Scene {
       keyPosToUse = this.keyPosition;
     }
 
-    // Só criar a chave se estivermos no tempo correto
     if (this.currentTime !== keyTimeToUse) {
       console.log(
         `Chave está no ${keyTimeToUse}, mas estamos no ${this.currentTime}`
@@ -638,7 +504,6 @@ export class Game extends Phaser.Scene {
       return;
     }
 
-    // Criar a chave na posição definida
     const key = this.keysGroup.create(
       keyPosToUse.x,
       keyPosToUse.y,
@@ -648,7 +513,6 @@ export class Game extends Phaser.Scene {
     key.setScale(1);
     key.body.setAllowGravity(false);
 
-    // Animação de flutuação
     this.tweens.add({
       targets: key,
       y: key.y - 5,
@@ -657,8 +521,6 @@ export class Game extends Phaser.Scene {
       yoyo: true,
       repeat: -1,
     });
-
-    // Brilho pulsante
     this.tweens.add({
       targets: key,
       alpha: { from: 0.7, to: 1 },
@@ -674,10 +536,6 @@ export class Game extends Phaser.Scene {
     this.keysCollected++;
     this.score += 100;
 
-    // Som de coleta (adicionar quando tiver audio)
-    // this.sound.play('collect');
-
-    // Feedback visual
     const text = this.add
       .text(key.x, key.y - 20, "+100", {
         fontSize: "16px",
@@ -685,7 +543,6 @@ export class Game extends Phaser.Scene {
         fontStyle: "bold",
       })
       .setOrigin(0.5);
-
     this.tweens.add({
       targets: text,
       y: text.y - 30,
@@ -694,20 +551,16 @@ export class Game extends Phaser.Scene {
       onComplete: () => text.destroy(),
     });
 
-    // Atualizar UI
     this.updateUI();
 
-    // Verificar se coletou todas as chaves
     if (this.keysCollected >= this.totalKeys) {
       this.levelComplete();
     }
   }
 
   timeTravel() {
-    // Usar o TimeTravelManager para realizar a viagem
     const newTime = this.timeTravelManager.travel();
 
-    // Ativar/desativar colliders baseado na época
     if (newTime === "passado") {
       if (this.passadoCollider) this.passadoCollider.active = true;
       if (this.futuroCollider) this.futuroCollider.active = false;
@@ -718,19 +571,10 @@ export class Game extends Phaser.Scene {
       console.log("✅ Colisões do FUTURO ativas, Passado desativadas");
     }
 
-    // Mostrar/esconder chave baseado no tempo
     this.keyManager.spawnKeys(newTime);
-
-    // Atualizar debug visual das paredes
     this.updateDebugGraphics(newTime);
-
-    // Som de viagem no tempo (adicionar quando tiver audio)
-    // this.sound.play('timeTravel');
   }
 
-  /**
-   * Atualiza o debug gráfico para mostrar as paredes da época atual
-   */
   updateDebugGraphics(currentTime) {
     // Debug desativado - para reativar, descomente o código abaixo
     /*
@@ -741,9 +585,7 @@ export class Game extends Phaser.Scene {
       this.debugGraphicsObj.setDepth(1000);
     }
 
-    const currentLayer =
-      currentTime === "passado" ? this.passadoPrincipal : this.futuroPrincipal;
-
+    const currentLayer = currentTime === "passado" ? this.passadoPrincipal : this.futuroPrincipal;
     if (currentLayer) {
       currentLayer.renderDebug(this.debugGraphicsObj, {
         tileColor: null,
@@ -751,29 +593,21 @@ export class Game extends Phaser.Scene {
         faceColor: new Phaser.Display.Color(40, 39, 37, 255),
       });
     }
-
     console.log(`🔍 DEBUG: Mostrando colisões do ${currentTime}`);
     */
   }
 
-  /**
-   * Morte do jogador
-   */
   playerDeath(reason = "Morreu!") {
-    if (this.isDead) return; // Evitar múltiplas mortes
+    if (this.isDead) return;
     this.isDead = true;
-
     console.log("Jogador morreu:", reason);
 
-    // Parar movimento do jogador
     this.player.setVelocity(0, 0);
     this.player.body.enable = false;
 
-    // Efeito visual de morte
     this.cameras.main.shake(200, 0.01);
     this.cameras.main.fade(500, 255, 0, 0);
 
-    // Mostrar mensagem
     const deathText = this.add
       .text(this.cameras.main.centerX, this.cameras.main.centerY, reason, {
         fontSize: "32px",
@@ -785,51 +619,30 @@ export class Game extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(200);
 
-    // Ir para Game Over
-    this.time.delayedCall(1500, () => {
-      this.gameOver();
-    });
+    this.time.delayedCall(1500, () => this.gameOver());
   }
 
   createUI() {
-    // Configurar UI para seguir a câmera
     const cam = this.cameras.main;
+    const textStyle = {
+      fontSize: "16px",
+      fontFamily: "Arial",
+      backgroundColor: "#000000aa",
+      padding: { x: 10, y: 5 },
+    };
 
-    // Painel de informações (fixo na tela)
     this.timeText = this.add
-      .text(16, 16, "", {
-        fontSize: "16px",
-        fontFamily: "Arial",
-        color: "#ffffff",
-        backgroundColor: "#000000aa",
-        padding: { x: 10, y: 5 },
-      })
+      .text(16, 16, "", { ...textStyle, color: "#ffffff" })
       .setScrollFactor(0)
       .setDepth(100);
-
     this.keysText = this.add
-      .text(16, 50, "", {
-        fontSize: "16px",
-        fontFamily: "Arial",
-        color: "#ffff00",
-        backgroundColor: "#000000aa",
-        padding: { x: 10, y: 5 },
-      })
+      .text(16, 50, "", { ...textStyle, color: "#ffff00" })
       .setScrollFactor(0)
       .setDepth(100);
-
     this.scoreText = this.add
-      .text(16, 84, "", {
-        fontSize: "16px",
-        fontFamily: "Arial",
-        color: "#00ff00",
-        backgroundColor: "#000000aa",
-        padding: { x: 10, y: 5 },
-      })
+      .text(16, 84, "", { ...textStyle, color: "#00ff00" })
       .setScrollFactor(0)
       .setDepth(100);
-
-    // Instruções
     this.instructionsText = this.add
       .text(
         cam.width / 2,
@@ -862,10 +675,8 @@ export class Game extends Phaser.Scene {
   }
 
   levelComplete() {
-    // Pausar o jogo
     this.physics.pause();
 
-    // Mensagem de nível completo
     const cam = this.cameras.main;
     const completeText = this.add
       .text(cam.width / 2, cam.height / 2, "NÍVEL COMPLETO!", {
@@ -879,7 +690,6 @@ export class Game extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(200);
 
-    // Efeito de pulsação
     this.tweens.add({
       targets: completeText,
       scale: { from: 0.8, to: 1.2 },
@@ -887,13 +697,8 @@ export class Game extends Phaser.Scene {
       ease: "Sine.inOut",
       yoyo: true,
       repeat: 2,
-      onComplete: () => {
-        // Próximo nível ou tela de vitória
-        this.time.delayedCall(1000, () => {
-          // Por agora, voltar ao menu
-          this.scene.start("MainMenu");
-        });
-      },
+      onComplete: () =>
+        this.time.delayedCall(1000, () => this.scene.start("MainMenu")),
     });
   }
 
@@ -901,11 +706,8 @@ export class Game extends Phaser.Scene {
     if (!this.player || !this.player.body || this.isDead) return;
 
     const speed = 100;
-
-    // Resetar velocidade
     this.player.body.setVelocity(0);
 
-    // Movimento horizontal
     if (this.cursors.left.isDown || this.keyA.isDown) {
       this.player.body.setVelocityX(-speed);
       this.player.anims.play("esquerdadireita", true);
@@ -924,19 +726,11 @@ export class Game extends Phaser.Scene {
       this.player.anims.stop();
     }
 
-    // Evitar linhas ao redor das tiles
     this.cameras.main.roundPixels = true;
-
-    // DEBUG: Atualizar posição do retângulo debug
-    if (this.debugRect) {
-      this.debugRect.setPosition(this.player.x, this.player.y);
-    }
   }
 
-  // Método para quando o jogador morrer ou perder
   gameOver() {
     const timeElapsed = Math.floor((Date.now() - this.startTime) / 1000);
-
     this.scene.start("GameOver", {
       level: this.level,
       score: this.score,

@@ -50,6 +50,7 @@ d) colisão com paredes não funcionava
 
 Solução:
 a) Ao exportar o mapa, fazer "Embed Tilset" primero para ter os ficheiros utilizados
+b) não percebi bem qual era o erro, mas tentei implementar com o codigo que fizemos nas aulas e com a imagem do IniMapMan e funcionou
 d) utilizar a propriedade personalizada 'collides' no Tiled para criar as colisões, invés de escrever codigo para fazer isso
 
 Decisões:
