@@ -13,10 +13,15 @@ export class Key extends Phaser.Physics.Arcade.Sprite {
     // Configurar propriedades
     this.setScale(1);
     this.body.setAllowGravity(false);
+    this.setDepth(50); // Acima das layers mas abaixo do jogador
 
     // Criar animações visuais
     this.createFloatingAnimation(scene);
     this.createGlowAnimation(scene);
+
+    console.log(
+      `Key criada em (${this.x}, ${this.y}), depth: ${this.depth}, visible: ${this.visible}`
+    );
   }
 
   /**

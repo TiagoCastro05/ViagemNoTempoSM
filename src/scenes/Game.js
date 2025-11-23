@@ -49,30 +49,18 @@ export class Game extends Phaser.Scene {
     );
 
     // Carregar personagem (spritesheet)
-    this.load.spritesheet(
-      "player_idle",
-      "assets/personagem/personagem/Idle.png",
-      {
-        frameWidth: 48,
-        frameHeight: 48,
-      }
-    );
-    this.load.spritesheet(
-      "player_walk",
-      "assets/personagem/personagem/Walk.png",
-      {
-        frameWidth: 48,
-        frameHeight: 48,
-      }
-    );
-    this.load.spritesheet(
-      "player_run",
-      "assets/personagem/personagem/Run.png",
-      {
-        frameWidth: 48,
-        frameHeight: 48,
-      }
-    );
+    this.load.spritesheet("player_idle", "assets/personagem/Idle.png", {
+      frameWidth: 48,
+      frameHeight: 48,
+    });
+    this.load.spritesheet("player_walk", "assets/personagem/Walk.png", {
+      frameWidth: 48,
+      frameHeight: 48,
+    });
+    this.load.spritesheet("player_run", "assets/personagem/Run.png", {
+      frameWidth: 48,
+      frameHeight: 48,
+    });
 
     // Carregar chave
     this.load.image("key", "assets/mapa/chave/16x16/key_t.png");
@@ -366,18 +354,68 @@ export class Game extends Phaser.Scene {
 
     // Configurar colisões nas layers principais
     if (this.passadoPrincipal) {
-      this.passadoPrincipal.setCollisionByProperty({ collides: true });
-      // Se não tiver property 'collides', usar exclusão de tiles vazios
-      this.passadoPrincipal.setCollisionByExclusion([-1, 6, 68]); // -1 = vazio, 6 = chão passado, 68 = chão futuro
+      // Configurar colisão em TODOS os tiles que não sejam vazios
+      this.passadoPrincipal.setCollisionByExclusion([-1]);
     }
 
     if (this.futuroPrincipal) {
-      this.futuroPrincipal.setCollisionByProperty({ collides: true });
-      this.futuroPrincipal.setCollisionByExclusion([-1, 6, 68]);
+      // Configurar colisão em TODOS os tiles que não sejam vazios
+      this.futuroPrincipal.setCollisionByExclusion([-1]);
     }
 
-    // Criar o jogador usando a classe Player
-    this.player = new Player(this, 240, 180);
+    // TESTE: Criar o jogador diretamente (sem classe) para debug
+    this.player = this.physics.add.sprite(240, 180, "player_idle", 0);
+    this.player.setCollideWorldBounds(true);
+    this.player.body.setSize(32, 40);
+    this.player.body.setOffset(8, 8);
+    this.player.setDepth(100);
+    this.player.setScale(2);
+
+    // Criar animações manualmente
+    if (!this.anims.exists("idle")) {
+      this.anims.create({
+        key: "idle",
+        frames: this.anims.generateFrameNumbers("player_idle", {
+          start: 0,
+          end: 3,
+        }),
+        frameRate: 8,
+        repeat: -1,
+      });
+    }
+    if (!this.anims.exists("walk")) {
+      this.anims.create({
+        key: "walk",
+        frames: this.anims.generateFrameNumbers("player_walk", {
+          start: 0,
+          end: 7,
+        }),
+        frameRate: 10,
+        repeat: -1,
+      });
+    }
+    if (!this.anims.exists("run")) {
+      this.anims.create({
+        key: "run",
+        frames: this.anims.generateFrameNumbers("player_run", {
+          start: 0,
+          end: 7,
+        }),
+        frameRate: 12,
+        repeat: -1,
+      });
+    }
+
+    this.player.play("idle");
+
+    console.log(
+      "TESTE: Jogador criado diretamente:",
+      this.player.x,
+      this.player.y
+    );
+    console.log("Texture key:", this.player.texture.key);
+    console.log("Frame:", this.player.frame.name);
+    console.log("Visible:", this.player.visible, "Alpha:", this.player.alpha);
 
     // DEBUG: Adicionar um círculo vermelho na posição do jogador para debug visual
     this.debugCircle = this.add.circle(
@@ -626,7 +664,7 @@ export class Game extends Phaser.Scene {
     // Usar o TimeTravelManager para realizar a viagem
     const newTime = this.timeTravelManager.travel();
 
-    // Recriar a chave no tempo correto (se for o tempo onde ela está)
+    // Mostrar/esconder chave baseado no tempo
     this.keyManager.spawnKeys(newTime);
 
     // Som de viagem no tempo (adicionar quando tiver audio)
