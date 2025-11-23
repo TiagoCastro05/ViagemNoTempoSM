@@ -1,4 +1,5 @@
 import { MainMenu } from "./scenes/MainMenu.js";
+import { Game } from "./scenes/Game.js";
 import { GameOver } from "./scenes/GameOver.js";
 
 const config = {
@@ -9,8 +10,15 @@ const config = {
   width: 1280,
   height: 720,
   backgroundColor: "#000000",
-  pixelArt: false,
-  scene: [MainMenu, GameOver],
+  pixelArt: true,
+  scene: [MainMenu, Game, GameOver],
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: 0 },
+      debug: false,
+    },
+  },
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,

@@ -254,19 +254,8 @@ export class MainMenu extends Phaser.Scene {
     this.cameras.main.fadeOut(500, 0, 0, 0);
 
     this.time.delayedCall(500, () => {
-      // TEMPORÁRIO: Para testar o GameOver, descomente as linhas abaixo
-      /*
-            this.scene.start('GameOver', {
-                level: 3,
-                score: 850,
-                timeElapsed: 180,
-                timeTravels: 8
-            });
-            */
-
-      // Quando tiver a cena do jogo, descomente a linha abaixo:
-      // this.scene.start('Game');
-      console.log("Iniciar jogo - A implementar na próxima fase");
+      // Iniciar a cena do jogo
+      this.scene.start("Game");
     });
   }
 
