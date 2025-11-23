@@ -50,13 +50,17 @@ export class Game extends Phaser.Scene {
     );
 
     // Carregar personagem (spritesheet)
-    this.load.spritesheet("player_idle", "assets/personagem/Idle.png", {
-      frameWidth: 48,
-      frameHeight: 48,
+    this.load.spritesheet("player_walk", "assets/personagem/RPG_assets.png", {
+      frameWidth: 16,
+      frameHeight: 16,
     });
-    this.load.spritesheet("player_walk", "assets/personagem/Walk.png", {
-      frameWidth: 48,
-      frameHeight: 48,
+
+    this.load.on("filecomplete-spritesheet-player_walk", () => {
+      console.log("✅ player_walk carregado com sucesso!");
+    });
+
+    this.load.on("loaderror", (file) => {
+      console.error("❌ Erro ao carregar arquivo:", file.src);
     });
 
     console.log("Preload: Assets do personagem carregados");
@@ -249,7 +253,7 @@ export class Game extends Phaser.Scene {
       .setOrigin(0);
 
     // Criar o jogador
-    this.player = this.physics.add.sprite(640, 360, "player_idle");
+    this.player = this.physics.add.sprite(640, 360, "player_walk");
     this.player.setCollideWorldBounds(true);
     this.player.body.setSize(32, 40);
     this.player.body.setOffset(8, 8);
@@ -373,70 +377,106 @@ export class Game extends Phaser.Scene {
     }
 
     // TESTE: Criar o jogador diretamente (sem classe) para debug
-    this.player = this.physics.add.sprite(48, 48, "player_idle", 0);
+    console.log("🎮 Iniciando criação do player...");
+
+    // Verificar se a textura existe ANTES de criar o sprite
+    if (!this.textures.exists("player_walk")) {
+      console.error("❌ ERRO CRÍTICO: Textura player_walk não existe!");
+      console.log("Texturas disponíveis:", this.textures.list);
+      return;
+    }
+
+    const walkTexture = this.textures.get("player_walk");
+    console.log("✅ Textura player_walk encontrada!");
+    console.log("   - Total de frames:", walkTexture.frameTotal);
+    console.log("   - Source image:", walkTexture.source[0].source.src);
+
+    // Usar frame 6 (down inicial)
+    this.player = this.physics.add.sprite(48, 48, "player_walk", 6);
+    console.log("✅ Sprite criado com frame 6!");
     this.player.setCollideWorldBounds(true);
-    this.player.body.setSize(12, 14);
-    this.player.body.setOffset(6, 5);
+    this.player.body.setSize(14, 14);
+    this.player.body.setOffset(1, 1);
     this.player.setDepth(100);
-    this.player.setScale(0.33); // 48px * 0.33 ≈ 16px (1 tile)
+    this.player.setScale(1); // 16px * 1 = 16px (1 tile)
+
+    console.log("✅ Propriedades físicas configuradas!");
 
     // Forçar visibilidade
     this.player.setVisible(true);
     this.player.setAlpha(1);
     this.player.clearTint();
+    this.player.setOrigin(0.5, 0.5); // Garantir que a origem está no centro
 
-    // Criar animações manualmente
-    if (!this.anims.exists("idle")) {
-      this.anims.create({
-        key: "idle",
-        frames: this.anims.generateFrameNumbers("player_idle", {
-          start: 0,
-          end: 3,
-        }),
-        frameRate: 8,
-        repeat: -1,
-      });
-    }
-    if (!this.anims.exists("walk")) {
-      this.anims.create({
-        key: "walk",
-        frames: this.anims.generateFrameNumbers("player_walk", {
-          start: 0,
-          end: 7,
-        }),
-        frameRate: 10,
-        repeat: -1,
-      });
-    }
+    // FORÇA A RENDERIZAÇÃO
+    this.children.bringToTop(this.player);
 
-    this.player.play("idle");
+    console.log("✅ Visibilidade forçada!");
+    console.log("   - Origin:", this.player.originX, this.player.originY);
+    console.log("   - Render:", this.player.willRender(this.cameras.main));
 
-    console.log(
-      "TESTE: Jogador criado diretamente:",
-      this.player.x,
-      this.player.y
-    );
+    // Criar animações do player
+    this.anims.create({
+      key: "esquerdadireita",
+      frames: this.anims.generateFrameNumbers("player_walk", {
+        frames: [1, 7, 1, 13],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "up",
+      frames: this.anims.generateFrameNumbers("player_walk", {
+        frames: [2, 8, 2, 14],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "down",
+      frames: this.anims.generateFrameNumbers("player_walk", {
+        frames: [0, 6, 0, 12],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    console.log("=== DEBUG DO PLAYER ===");
+    console.log("Posição:", this.player.x, this.player.y);
     console.log("Texture key:", this.player.texture.key);
-    console.log("Frame:", this.player.frame.name);
-    console.log("Visible:", this.player.visible, "Alpha:", this.player.alpha);
+    console.log("Frame atual:", this.player.frame.name);
+    console.log("Visible:", this.player.visible);
+    console.log("Alpha:", this.player.alpha);
     console.log("Depth:", this.player.depth);
+    console.log("Scale:", this.player.scaleX, this.player.scaleY);
+    console.log("Tint:", this.player.tintTopLeft);
+    console.log(
+      "Display Width/Height:",
+      this.player.displayWidth,
+      this.player.displayHeight
+    );
+    console.log("World Position:", this.player.getCenter());
     console.log("Camera zoom:", this.cameras.main.zoom);
+    console.log("Camera bounds:", this.cameras.main.getBounds());
+    console.log("========================");
 
     // Verificar se a textura foi carregada corretamente
-    const texture = this.textures.get("player_idle");
+    const texture = this.textures.get("player_walk");
     console.log("Texture exists:", texture && texture.key);
     console.log("Texture frames:", texture ? texture.frameTotal : "N/A");
 
-    // DEBUG: Adicionar um retângulo azul GRANDE para ver se aparece
+    // DEBUG: Adicionar um retângulo azul para comparação de tamanho
     this.debugRect = this.add.rectangle(
       this.player.x,
       this.player.y,
-      64,
-      64,
+      32,
+      32,
       0x0000ff,
-      0.7
+      0.3 // Mais transparente para não cobrir o sprite
     );
-    this.debugRect.setDepth(99);
+    this.debugRect.setDepth(98); // ABAIXO do player agora!
 
     // Configurar câmera
     this.cameras.main.startFollow(this.player);
@@ -524,17 +564,6 @@ export class Game extends Phaser.Scene {
   }
 
   createAnimations() {
-    // Idle
-    this.anims.create({
-      key: "idle",
-      frames: this.anims.generateFrameNumbers("player_idle", {
-        start: 0,
-        end: 3,
-      }),
-      frameRate: 8,
-      repeat: -1,
-    });
-
     // Walk
     this.anims.create({
       key: "walk",
@@ -546,7 +575,7 @@ export class Game extends Phaser.Scene {
       repeat: -1,
     });
 
-    this.player.play("idle");
+    this.player.play("walk");
   }
 
   spawnKeys() {
@@ -871,43 +900,32 @@ export class Game extends Phaser.Scene {
   update() {
     if (!this.player || !this.player.body || this.isDead) return;
 
-    const speed = 120;
+    const speed = 100;
+
+    // Resetar velocidade
+    this.player.body.setVelocity(0);
 
     // Movimento horizontal
     if (this.cursors.left.isDown || this.keyA.isDown) {
-      this.player.setVelocityX(-speed);
-      this.player.setFlipX(true);
-      this.player.play("walk", true);
+      this.player.body.setVelocityX(-speed);
+      this.player.anims.play("esquerdadireita", true);
+      this.player.flipX = true;
     } else if (this.cursors.right.isDown || this.keyD.isDown) {
-      this.player.setVelocityX(speed);
-      this.player.setFlipX(false);
-      this.player.play("walk", true);
-    } else {
-      this.player.setVelocityX(0);
-    }
-
-    // Movimento vertical
-    if (this.cursors.up.isDown || this.keyW.isDown) {
-      this.player.setVelocityY(-speed);
-      if (this.player.body.velocity.x === 0) {
-        this.player.play("walk", true);
-      }
+      this.player.body.setVelocityX(speed);
+      this.player.anims.play("esquerdadireita", true);
+      this.player.flipX = false;
+    } else if (this.cursors.up.isDown || this.keyW.isDown) {
+      this.player.body.setVelocityY(-speed);
+      this.player.anims.play("up", true);
     } else if (this.cursors.down.isDown || this.keyS.isDown) {
-      this.player.setVelocityY(speed);
-      if (this.player.body.velocity.x === 0) {
-        this.player.play("walk", true);
-      }
+      this.player.body.setVelocityY(speed);
+      this.player.anims.play("down", true);
     } else {
-      this.player.setVelocityY(0);
+      this.player.anims.stop();
     }
 
-    // Idle quando parado
-    if (
-      this.player.body.velocity.x === 0 &&
-      this.player.body.velocity.y === 0
-    ) {
-      this.player.play("idle", true);
-    }
+    // Evitar linhas ao redor das tiles
+    this.cameras.main.roundPixels = true;
 
     // DEBUG: Atualizar posição do retângulo debug
     if (this.debugRect) {

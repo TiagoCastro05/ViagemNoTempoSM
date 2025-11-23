@@ -35,9 +35,11 @@ Decisões:
 
 Sessão 2 – 23 de novembro de 2025
 
-Objetivo: Procurar e Criar os assets necessários
+Objetivo: Procurar, criar e introduzir os assets visuais necessários
 
 Atividades realizadas:
+Criação dos mapas do presente e passado
+Implementação do sistema de colisões com paredes
 
 
 Problemas:

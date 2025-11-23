@@ -4,7 +4,7 @@
  */
 export class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
-    super(scene, x, y, "player_idle");
+    super(scene, x, y, "player_walk");
 
     // Adicionar ao scene e ao sistema de física
     scene.add.existing(this);
@@ -12,10 +12,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     // Configurar propriedades físicas
     this.setCollideWorldBounds(true);
-    this.body.setSize(24, 28);
-    this.body.setOffset(12, 10);
+    this.body.setSize(20, 24);
+    this.body.setOffset(10, 12);
     this.setDepth(100);
-    this.setScale(0.67); // 48px * 0.67 ≈ 32px (2 tiles de 16x16)
+    this.setScale(0.5); // 48px * 0.5 = 24px (mais visível)
 
     // Velocidades
     this.walkSpeed = 120;
@@ -23,8 +23,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     // Criar animações
     this.createAnimations();
 
-    // Iniciar com animação idle
-    this.play("idle");
+    // Iniciar com animação walk
+    this.play("walk");
 
     console.log("Jogador criado:", this.x, this.y, "depth:", this.depth);
     console.log("Sprite visível:", this.visible, "alpha:", this.alpha);
@@ -39,19 +39,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   createAnimations() {
     const scene = this.scene;
 
-    // Verificar se as animações já existem para não duplicar
-    if (!scene.anims.exists("idle")) {
-      scene.anims.create({
-        key: "idle",
-        frames: scene.anims.generateFrameNumbers("player_idle", {
-          start: 0,
-          end: 3,
-        }),
-        frameRate: 8,
-        repeat: -1,
-      });
-    }
-
+    // Verificar se a animação já existe para não duplicar
     if (!scene.anims.exists("walk")) {
       scene.anims.create({
         key: "walk",
@@ -100,14 +88,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     // Atualizar animação baseado no movimento
-    if (isMoving) {
-      if (isRunning) {
-        this.play("run", true);
-      } else {
-        this.play("walk", true);
-      }
-    } else {
-      this.play("idle", true);
-    }
+    // Sempre toca a animação walk
+    this.play("walk", true);
   }
 }
