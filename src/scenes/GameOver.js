@@ -260,11 +260,8 @@ export class GameOver extends Phaser.Scene {
     this.cameras.main.fadeOut(500, 0, 0, 0);
 
     this.time.delayedCall(500, () => {
-      // Reiniciar o jogo do início
-      // this.scene.start('Game');
-      console.log(
-        "Reiniciar jogo - A implementar quando a cena do jogo estiver pronta"
-      );
+      // Reiniciar o jogo
+      this.scene.start("Game");
     });
   }
 

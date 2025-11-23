@@ -43,8 +43,11 @@ Atividades realizadas:
 Problemas:
 a) Erro ao mostrar o mapa no browser
 b) Erro ao mostrar personagem no browser
+c) Chaves apareciam todas ao mesmo tempo
+d) colisão com paredes não funcionava
 
 Solução:
 a) Ao exportar o mapa, fazer "Embed Tilset" primero para ter os ficheiros utilizados
+d) utilizar a propriedade personalizada 'collides' no Tiled para criar as colisões, invés de escrever codigo para fazer isso
 
 Decisões:

@@ -12,14 +12,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     // Configurar propriedades físicas
     this.setCollideWorldBounds(true);
-    this.body.setSize(32, 40);
-    this.body.setOffset(8, 8);
+    this.body.setSize(24, 28);
+    this.body.setOffset(12, 10);
     this.setDepth(100);
-    this.setScale(2);
+    this.setScale(0.67); // 48px * 0.67 ≈ 32px (2 tiles de 16x16)
 
     // Velocidades
-    this.walkSpeed = 100;
-    this.runSpeed = 160;
+    this.walkSpeed = 120;
 
     // Criar animações
     this.createAnimations();
@@ -61,18 +60,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           end: 7,
         }),
         frameRate: 10,
-        repeat: -1,
-      });
-    }
-
-    if (!scene.anims.exists("run")) {
-      scene.anims.create({
-        key: "run",
-        frames: scene.anims.generateFrameNumbers("player_run", {
-          start: 0,
-          end: 7,
-        }),
-        frameRate: 12,
         repeat: -1,
       });
     }

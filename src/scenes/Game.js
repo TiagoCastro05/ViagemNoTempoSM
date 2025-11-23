@@ -12,6 +12,7 @@ export class Game extends Phaser.Scene {
     this.level = 1;
     this.score = 0;
     this.startTime = 0;
+    this.isDead = false;
 
     // Managers (serão inicializados no create)
     this.timeTravelManager = null;
@@ -57,18 +58,14 @@ export class Game extends Phaser.Scene {
       frameWidth: 48,
       frameHeight: 48,
     });
-    this.load.spritesheet("player_run", "assets/personagem/Run.png", {
-      frameWidth: 48,
-      frameHeight: 48,
-    });
-
-    // Carregar chave
-    this.load.image("key", "assets/mapa/chave/16x16/key_t.png");
 
     console.log("Preload: Assets do personagem carregados");
   }
 
   create() {
+    // Resetar estado do jogo
+    this.keysCollected = 0;
+    this.isDead = false;
     this.startTime = Date.now();
 
     // Criar o mapa
@@ -354,22 +351,39 @@ export class Game extends Phaser.Scene {
 
     // Configurar colisões nas layers principais
     if (this.passadoPrincipal) {
-      // Configurar colisão em TODOS os tiles que não sejam vazios
-      this.passadoPrincipal.setCollisionByExclusion([-1]);
+      // Limpar todas as colisões primeiro
+      this.passadoPrincipal.setCollision([]);
+
+      // Configurar colisão apenas nos tijolos pretos (não no chão)
+      // Vamos usar setCollisionBetween para um range de tiles de parede
+      // Você precisa ajustar esses IDs para os tijolos pretos do seu tileset
+      this.passadoPrincipal.setCollisionByProperty({ collides: true });
+
+      console.log("Colisões configuradas para o passado");
     }
 
     if (this.futuroPrincipal) {
-      // Configurar colisão em TODOS os tiles que não sejam vazios
-      this.futuroPrincipal.setCollisionByExclusion([-1]);
+      // Limpar todas as colisões primeiro
+      this.futuroPrincipal.setCollision([]);
+
+      // Configurar colisão apenas nos tijolos pretos/paredes
+      this.futuroPrincipal.setCollisionByProperty({ collides: true });
+
+      console.log("Colisões configuradas para o futuro");
     }
 
     // TESTE: Criar o jogador diretamente (sem classe) para debug
-    this.player = this.physics.add.sprite(240, 180, "player_idle", 0);
+    this.player = this.physics.add.sprite(48, 48, "player_idle", 0);
     this.player.setCollideWorldBounds(true);
-    this.player.body.setSize(32, 40);
-    this.player.body.setOffset(8, 8);
+    this.player.body.setSize(12, 14);
+    this.player.body.setOffset(6, 5);
     this.player.setDepth(100);
-    this.player.setScale(2);
+    this.player.setScale(0.33); // 48px * 0.33 ≈ 16px (1 tile)
+
+    // Forçar visibilidade
+    this.player.setVisible(true);
+    this.player.setAlpha(1);
+    this.player.clearTint();
 
     // Criar animações manualmente
     if (!this.anims.exists("idle")) {
@@ -394,17 +408,6 @@ export class Game extends Phaser.Scene {
         repeat: -1,
       });
     }
-    if (!this.anims.exists("run")) {
-      this.anims.create({
-        key: "run",
-        frames: this.anims.generateFrameNumbers("player_run", {
-          start: 0,
-          end: 7,
-        }),
-        frameRate: 12,
-        repeat: -1,
-      });
-    }
 
     this.player.play("idle");
 
@@ -416,21 +419,24 @@ export class Game extends Phaser.Scene {
     console.log("Texture key:", this.player.texture.key);
     console.log("Frame:", this.player.frame.name);
     console.log("Visible:", this.player.visible, "Alpha:", this.player.alpha);
+    console.log("Depth:", this.player.depth);
+    console.log("Camera zoom:", this.cameras.main.zoom);
 
-    // DEBUG: Adicionar um círculo vermelho na posição do jogador para debug visual
-    this.debugCircle = this.add.circle(
+    // Verificar se a textura foi carregada corretamente
+    const texture = this.textures.get("player_idle");
+    console.log("Texture exists:", texture && texture.key);
+    console.log("Texture frames:", texture ? texture.frameTotal : "N/A");
+
+    // DEBUG: Adicionar um retângulo azul GRANDE para ver se aparece
+    this.debugRect = this.add.rectangle(
       this.player.x,
       this.player.y,
-      20,
-      0xff0000,
-      0.5
+      64,
+      64,
+      0x0000ff,
+      0.7
     );
-    this.debugCircle.setDepth(150);
-    console.log(
-      "DEBUG: Círculo vermelho criado em:",
-      this.player.x,
-      this.player.y
-    );
+    this.debugRect.setDepth(99);
 
     // Configurar câmera
     this.cameras.main.startFollow(this.player);
@@ -442,12 +448,20 @@ export class Game extends Phaser.Scene {
       this.map.heightInPixels
     );
 
-    // Configurar colisões
+    // Configurar colisões - criar colliders separados para cada época
     if (this.passadoPrincipal) {
-      this.physics.add.collider(this.player, this.passadoPrincipal);
+      this.passadoCollider = this.physics.add.collider(
+        this.player,
+        this.passadoPrincipal
+      );
+      this.passadoCollider.active = true; // Ativo no início (começa no passado)
     }
     if (this.futuroPrincipal) {
-      this.physics.add.collider(this.player, this.futuroPrincipal);
+      this.futuroCollider = this.physics.add.collider(
+        this.player,
+        this.futuroPrincipal
+      );
+      this.futuroCollider.active = false; // Inativo no início
     }
 
     // Inicializar TimeTravelManager
@@ -478,8 +492,19 @@ export class Game extends Phaser.Scene {
     // UI
     this.createUI();
 
-    // Debug (opcional - comentar em produção)
-    // this.physics.world.createDebugGraphic();
+    // Debug desativado - colisões configuradas
+    // Para reativar, descomente as linhas abaixo
+    /*
+    this.debugGraphicsObj = this.add.graphics();
+    this.debugGraphicsObj.setDepth(1000);
+    if (this.passadoPrincipal) {
+      this.passadoPrincipal.renderDebug(this.debugGraphicsObj, {
+        tileColor: null,
+        collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200),
+        faceColor: new Phaser.Display.Color(40, 39, 37, 255),
+      });
+    }
+    */
   }
 
   setupControls() {
@@ -518,17 +543,6 @@ export class Game extends Phaser.Scene {
         end: 7,
       }),
       frameRate: 10,
-      repeat: -1,
-    });
-
-    // Run
-    this.anims.create({
-      key: "run",
-      frames: this.anims.generateFrameNumbers("player_run", {
-        start: 0,
-        end: 7,
-      }),
-      frameRate: 12,
       repeat: -1,
     });
 
@@ -664,11 +678,88 @@ export class Game extends Phaser.Scene {
     // Usar o TimeTravelManager para realizar a viagem
     const newTime = this.timeTravelManager.travel();
 
+    // Ativar/desativar colliders baseado na época
+    if (newTime === "passado") {
+      if (this.passadoCollider) this.passadoCollider.active = true;
+      if (this.futuroCollider) this.futuroCollider.active = false;
+      console.log("✅ Colisões do PASSADO ativas, Futuro desativadas");
+    } else {
+      if (this.passadoCollider) this.passadoCollider.active = false;
+      if (this.futuroCollider) this.futuroCollider.active = true;
+      console.log("✅ Colisões do FUTURO ativas, Passado desativadas");
+    }
+
     // Mostrar/esconder chave baseado no tempo
     this.keyManager.spawnKeys(newTime);
 
+    // Atualizar debug visual das paredes
+    this.updateDebugGraphics(newTime);
+
     // Som de viagem no tempo (adicionar quando tiver audio)
     // this.sound.play('timeTravel');
+  }
+
+  /**
+   * Atualiza o debug gráfico para mostrar as paredes da época atual
+   */
+  updateDebugGraphics(currentTime) {
+    // Debug desativado - para reativar, descomente o código abaixo
+    /*
+    if (this.debugGraphicsObj) {
+      this.debugGraphicsObj.clear();
+    } else {
+      this.debugGraphicsObj = this.add.graphics();
+      this.debugGraphicsObj.setDepth(1000);
+    }
+
+    const currentLayer =
+      currentTime === "passado" ? this.passadoPrincipal : this.futuroPrincipal;
+
+    if (currentLayer) {
+      currentLayer.renderDebug(this.debugGraphicsObj, {
+        tileColor: null,
+        collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200),
+        faceColor: new Phaser.Display.Color(40, 39, 37, 255),
+      });
+    }
+
+    console.log(`🔍 DEBUG: Mostrando colisões do ${currentTime}`);
+    */
+  }
+
+  /**
+   * Morte do jogador
+   */
+  playerDeath(reason = "Morreu!") {
+    if (this.isDead) return; // Evitar múltiplas mortes
+    this.isDead = true;
+
+    console.log("Jogador morreu:", reason);
+
+    // Parar movimento do jogador
+    this.player.setVelocity(0, 0);
+    this.player.body.enable = false;
+
+    // Efeito visual de morte
+    this.cameras.main.shake(200, 0.01);
+    this.cameras.main.fade(500, 255, 0, 0);
+
+    // Mostrar mensagem
+    const deathText = this.add
+      .text(this.cameras.main.centerX, this.cameras.main.centerY, reason, {
+        fontSize: "32px",
+        color: "#ff0000",
+        backgroundColor: "#000000",
+        padding: { x: 20, y: 10 },
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(200);
+
+    // Ir para Game Over
+    this.time.delayedCall(1500, () => {
+      this.gameOver();
+    });
   }
 
   createUI() {
@@ -778,60 +869,33 @@ export class Game extends Phaser.Scene {
   }
 
   update() {
-    if (!this.player || !this.player.body) return;
+    if (!this.player || !this.player.body || this.isDead) return;
 
-    const speed = 100;
-    const runSpeed = 160;
-
-    // Verificar se está correndo (Shift)
-    const isRunning = this.input.keyboard.checkDown(
-      this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT)
-    );
-    const currentSpeed = isRunning ? runSpeed : speed;
+    const speed = 120;
 
     // Movimento horizontal
     if (this.cursors.left.isDown || this.keyA.isDown) {
-      this.player.setVelocityX(-currentSpeed);
+      this.player.setVelocityX(-speed);
       this.player.setFlipX(true);
-
-      if (isRunning) {
-        this.player.play("run", true);
-      } else {
-        this.player.play("walk", true);
-      }
+      this.player.play("walk", true);
     } else if (this.cursors.right.isDown || this.keyD.isDown) {
-      this.player.setVelocityX(currentSpeed);
+      this.player.setVelocityX(speed);
       this.player.setFlipX(false);
-
-      if (isRunning) {
-        this.player.play("run", true);
-      } else {
-        this.player.play("walk", true);
-      }
+      this.player.play("walk", true);
     } else {
       this.player.setVelocityX(0);
     }
 
     // Movimento vertical
     if (this.cursors.up.isDown || this.keyW.isDown) {
-      this.player.setVelocityY(-currentSpeed);
-
+      this.player.setVelocityY(-speed);
       if (this.player.body.velocity.x === 0) {
-        if (isRunning) {
-          this.player.play("run", true);
-        } else {
-          this.player.play("walk", true);
-        }
+        this.player.play("walk", true);
       }
     } else if (this.cursors.down.isDown || this.keyS.isDown) {
-      this.player.setVelocityY(currentSpeed);
-
+      this.player.setVelocityY(speed);
       if (this.player.body.velocity.x === 0) {
-        if (isRunning) {
-          this.player.play("run", true);
-        } else {
-          this.player.play("walk", true);
-        }
+        this.player.play("walk", true);
       }
     } else {
       this.player.setVelocityY(0);
@@ -845,9 +909,9 @@ export class Game extends Phaser.Scene {
       this.player.play("idle", true);
     }
 
-    // DEBUG: Atualizar posição do círculo debug
-    if (this.debugCircle) {
-      this.debugCircle.setPosition(this.player.x, this.player.y);
+    // DEBUG: Atualizar posição do retângulo debug
+    if (this.debugRect) {
+      this.debugRect.setPosition(this.player.x, this.player.y);
     }
   }
 
