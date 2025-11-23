@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="9">
  <editorsettings>
-  <export target="mapa/mapas..tmj" format="json"/>
+  <export target="mapa/mapas.json" format="json"/>
  </editorsettings>
- <tileset firstgid="1" source="../../passado.tsx"/>
+ <tileset firstgid="1" source="mapa/Passado/passado.tsx"/>
  <tileset firstgid="26" source="../../tiled/Futuro_paredes.tsx"/>
  <tileset firstgid="75" source="../../tiled/futuro_portas.tsx"/>
  <tileset firstgid="124" source="../../tiled/futuro_obstaculos.tsx"/>

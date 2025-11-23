@@ -24,7 +24,13 @@ Solução:
 Decisões:
 - Corrigir o problema 2 e fazer resto do jogo
 
+
+
+
 ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+
 
 
 Sessão 2 – 23 de novembro de 2025
@@ -35,9 +41,10 @@ Atividades realizadas:
 
 
 Problemas:
-
+a) Erro ao mostrar o mapa no browser
+b) Erro ao mostrar personagem no browser
 
 Solução:
-
+a) Ao exportar o mapa, fazer "Embed Tilset" primero para ter os ficheiros utilizados
 
 Decisões:
