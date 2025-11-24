@@ -11,11 +11,11 @@ Atividades realizadas:
     -> "Testar Game Over": Para verificar como está o ecrã Game Over.
 
 Problemas:
- 1) O metodo "clearScreen" não funcioanva. Quando clicava no "Inicial" ou "Instruções", o menu inicial não desaparecia e o texto ficava sobreposto, tornando muito dificil de ler.
- 2) Ao voltar para o menu inicial na screen do Game Over, o background fica preto, invés do azul escuro
+ a) O metodo "clearScreen" não funcioanva. Quando clicava no "Inicial" ou "Instruções", o menu inicial não desaparecia e o texto ficava sobreposto, tornando muito dificil de ler.
+ b) Ao voltar para o menu inicial na screen do Game Over, o background fica preto, invés do azul escuro
 
 Solução:
- 1) Dar prioridade ao fundo com 'setDepth(-1)' para ficar sempre atrás e limpar só o que interessa. O clearScreen() agora remove tudo exceto o fundo.
+ a) Dar prioridade ao fundo com 'setDepth(-1)' para ficar sempre atrás e limpar só o que interessa. O clearScreen() agora remove tudo exceto o fundo.
 
  Utilização de IA:
 - utilizei IA para criar os menus porque queria adiantar o relatório com o prototipo de baixa fidelidade (1 ou 2 ecrãs), porque na semana a seguir vou ter 2 testes 
@@ -38,19 +38,47 @@ Sessão 2 – 23 de novembro de 2025
 Objetivo: Procurar, criar e introduzir os assets visuais necessários
 
 Atividades realizadas:
+
 Criação dos mapas do presente e passado
 Implementação do sistema de colisões com paredes
+Correção do sistema de animações do personagem
+Otimização do código (remoção de comentários redundantes)
+Problemas:
+a) Erro ao mostrar o mapa no browser
+b) Personagem invisível no jogo (sprite não aparecia)
+c) Chaves apareciam todas ao mesmo tempo
+d) Colisão com paredes não funcionava
+
+Solução:
+a) Ao exportar o mapa, fazer "Embed Tileset" primeiro para ter os ficheiros utilizados
+b) Ficheiro Walk.png tinha frames vazios/transparentes. Mudei para RPG_assets.png (16×16) e implementei animações direcionais (esquerdadireita, up, down)
+c) Sistema de spawn aleatório implementado com KeyManager - chave aparece só no tempo correto (passado ou futuro)
+d) Utilizar a propriedade personalizada 'collides' no Tiled para criar as colisões, invés de escrever código para fazer isso
+
+Decisões:
+
+Usar RPG_assets.png como spritesheet principal do personagem
+Manter apenas logs essenciais (chaves e viagem no tempo)
+Consolidar código para melhor legibilidade
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+
+
+
+Sessão 3 – 24 de novembro de 2025
+
+Objetivo: Fazer com que o player morra ao tocar em certos blocos
+
+Atividades realizadas:
 
 
 Problemas:
-a) Erro ao mostrar o mapa no browser
-b) Erro ao mostrar personagem no browser
-c) Chaves apareciam todas ao mesmo tempo
-d) colisão com paredes não funcionava
+
 
 Solução:
-a) Ao exportar o mapa, fazer "Embed Tilset" primero para ter os ficheiros utilizados
-b) não percebi bem qual era o erro, mas tentei implementar com o codigo que fizemos nas aulas e com a imagem do IniMapMan e funcionou
-d) utilizar a propriedade personalizada 'collides' no Tiled para criar as colisões, invés de escrever codigo para fazer isso
+
 
 Decisões:

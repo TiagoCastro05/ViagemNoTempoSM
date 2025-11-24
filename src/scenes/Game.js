@@ -324,12 +324,14 @@ export class Game extends Phaser.Scene {
     if (this.passadoPrincipal) {
       this.passadoPrincipal.setCollision([]);
       this.passadoPrincipal.setCollisionByProperty({ collides: true });
+      this.passadoPrincipal.setCollisionByProperty({ kills: true });
       console.log("Colisões configuradas para o passado");
     }
 
     if (this.futuroPrincipal) {
       this.futuroPrincipal.setCollision([]);
       this.futuroPrincipal.setCollisionByProperty({ collides: true });
+      this.futuroPrincipal.setCollisionByProperty({ kills: true });
       console.log("Colisões configuradas para o futuro");
     }
 
@@ -383,14 +385,24 @@ export class Game extends Phaser.Scene {
     if (this.passadoPrincipal) {
       this.passadoCollider = this.physics.add.collider(
         this.player,
-        this.passadoPrincipal
+        this.passadoPrincipal,
+        (player, tile) => {
+          if (tile.properties.kills) {
+            this.playerDeath("Tocaste num tile mortal!");
+          }
+        }
       );
       this.passadoCollider.active = true; // Ativo no início (começa no passado)
     }
     if (this.futuroPrincipal) {
       this.futuroCollider = this.physics.add.collider(
         this.player,
-        this.futuroPrincipal
+        this.futuroPrincipal,
+        (player, tile) => {
+          if (tile.properties.kills) {
+            this.playerDeath("Tocaste num tile mortal!");
+          }
+        }
       );
       this.futuroCollider.active = false; // Inativo no início
     }
