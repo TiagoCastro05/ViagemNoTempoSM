@@ -73,12 +73,14 @@ Sessão 3 – 24 de novembro de 2025
 Objetivo: Fazer com que o player morra ao tocar em certos blocos
 
 Atividades realizadas:
-
+O player morre ao tocar nos tiles de picos/agua/lava
+Melhoria no que acontece quando o player morre (Camara shake, fade, mensagens de morte, etc...)
+Jogo a ocupar o ecrã todo
 
 Problemas:
-
+  a) As colisões do nivel do passado pararam de funcionar.
 
 Solução:
-
+  a) No Tiled, eu fiz com que o proprio chão tivesse a colisão ativa, por isso o era como se o player estive dentro de uma grande parede. Para corrigir só tive que desligar a propriedade "collides" dos tiles do chão
 
 Decisões:

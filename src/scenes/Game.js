@@ -13,6 +13,10 @@ export class Game extends Phaser.Scene {
     this.score = 0;
     this.startTime = 0;
     this.isDead = false;
+    this.deathReason = "";
+    this.doorUnlocked = false;
+    this.doorPosition = null;
+    this.levelCompleting = false;
 
     // Managers (serão inicializados no create)
     this.timeTravelManager = null;
@@ -232,7 +236,7 @@ export class Game extends Phaser.Scene {
     this.physics.add.collider(this.player, this.wallsGroup);
 
     // Configurar câmera
-    this.cameras.main.setZoom(1);
+    this.cameras.main.setZoom(3.0);
 
     // Criar animações do personagem
     this.createAnimations();
@@ -373,7 +377,7 @@ export class Game extends Phaser.Scene {
 
     // Configurar câmera
     this.cameras.main.startFollow(this.player);
-    this.cameras.main.setZoom(2);
+    this.cameras.main.setZoom(4.5);
     this.cameras.main.setBounds(
       0,
       0,
@@ -388,7 +392,7 @@ export class Game extends Phaser.Scene {
         this.passadoPrincipal,
         (player, tile) => {
           if (tile.properties.kills) {
-            this.playerDeath("Tocaste num tile mortal!");
+            this.playerDeath(this.getDeathMessage(tile.properties.deathType));
           }
         }
       );
@@ -400,7 +404,7 @@ export class Game extends Phaser.Scene {
         this.futuroPrincipal,
         (player, tile) => {
           if (tile.properties.kills) {
-            this.playerDeath("Tocaste num tile mortal!");
+            this.playerDeath(this.getDeathMessage(tile.properties.deathType));
           }
         }
       );
@@ -426,6 +430,7 @@ export class Game extends Phaser.Scene {
       this
     );
 
+    this.setupDoor();
     this.setupControls();
     this.createUI();
     /*
@@ -566,8 +571,87 @@ export class Game extends Phaser.Scene {
     this.updateUI();
 
     if (this.keysCollected >= this.totalKeys) {
+      this.unlockDoor();
+    }
+  }
+
+  setupDoor() {
+    const doorLayer = this.map.getObjectLayer("chaves futuro");
+    if (!doorLayer) return;
+
+    const doorObject = doorLayer.objects.find(
+      (obj) => obj.type === "door" || obj.name === "door"
+    );
+    if (doorObject) {
+      this.doorPosition = { x: doorObject.x, y: doorObject.y };
+      console.log(`Porta encontrada em (${doorObject.x}, ${doorObject.y})`);
+    }
+  }
+
+  unlockDoor() {
+    this.doorUnlocked = true;
+
+    if (this.doorPosition && this.futuroPrincipal) {
+      const tileX = this.futuroPrincipal.worldToTileX(this.doorPosition.x);
+      const tileY = this.futuroPrincipal.worldToTileY(this.doorPosition.y);
+
+      // Mudar tile da porta fechada (ID 30 + firstgid do tileset) para porta aberta (ID 28 + firstgid)
+      // futuro_portas tem firstgid 75, então: porta fechada = 105, porta aberta = 103
+      this.futuroPrincipal.putTileAt(103, tileX, tileY);
+
+      console.log("Porta desbloqueada! Vai até à porta para passar de nível.");
+
+      // Feedback visual
+      const doorText = this.add
+        .text(this.doorPosition.x, this.doorPosition.y - 30, "Porta Aberta!", {
+          fontSize: "16px",
+          color: "#00ff00",
+          fontStyle: "bold",
+          stroke: "#000000",
+          strokeThickness: 3,
+        })
+        .setOrigin(0.5)
+        .setDepth(200);
+
+      this.tweens.add({
+        targets: doorText,
+        y: doorText.y - 20,
+        alpha: 0,
+        duration: 2000,
+        onComplete: () => doorText.destroy(),
+      });
+    }
+  }
+
+  checkDoorEntry() {
+    if (
+      !this.doorUnlocked ||
+      !this.doorPosition ||
+      !this.player ||
+      this.levelCompleting
+    )
+      return;
+
+    const distance = Phaser.Math.Distance.Between(
+      this.player.x,
+      this.player.y,
+      this.doorPosition.x,
+      this.doorPosition.y
+    );
+
+    if (distance < 20) {
+      this.levelCompleting = true;
       this.levelComplete();
     }
+  }
+
+  getDeathMessage(deathType) {
+    const messages = {
+      agua: "Caiste na água e afogaste!",
+      lava: "Caiste em lava e morreste queimado!",
+      picos: "Caiste em cima de espinhos e viraste uma espetada!",
+    };
+    return messages[deathType] || "Morreste!";
   }
 
   timeTravel() {
@@ -577,14 +661,39 @@ export class Game extends Phaser.Scene {
       if (this.passadoCollider) this.passadoCollider.active = true;
       if (this.futuroCollider) this.futuroCollider.active = false;
       console.log("✅ Colisões do PASSADO ativas, Futuro desativadas");
+
+      // Verificar se o player está dentro de uma parede no passado
+      this.checkPlayerInWall(this.passadoPrincipal);
     } else {
       if (this.passadoCollider) this.passadoCollider.active = false;
       if (this.futuroCollider) this.futuroCollider.active = true;
       console.log("✅ Colisões do FUTURO ativas, Passado desativadas");
+
+      // Verificar se o player está dentro de uma parede no futuro
+      this.checkPlayerInWall(this.futuroPrincipal);
     }
 
-    this.keyManager.spawnKeys(newTime);
+    // Só spawnar chaves se ainda não coletou todas
+    if (this.keysCollected < this.totalKeys) {
+      this.keyManager.spawnKeys(newTime);
+    }
     this.updateDebugGraphics(newTime);
+  }
+
+  checkPlayerInWall(layer) {
+    if (!layer || !this.player) return;
+
+    // Obter a posição do player em tiles
+    const playerTileX = layer.worldToTileX(this.player.x);
+    const playerTileY = layer.worldToTileY(this.player.y);
+
+    // Obter o tile na posição do player
+    const tile = layer.getTileAt(playerTileX, playerTileY);
+
+    // Se existe um tile com colisão na posição do player, ele morre
+    if (tile && tile.properties.collides) {
+      this.playerDeath("Ficaste preso numa parede!");
+    }
   }
 
   updateDebugGraphics(currentTime) {
@@ -612,15 +721,16 @@ export class Game extends Phaser.Scene {
   playerDeath(reason = "Morreu!") {
     if (this.isDead) return;
     this.isDead = true;
+    this.deathReason = reason;
     console.log("Jogador morreu:", reason);
 
     this.player.setVelocity(0, 0);
     this.player.body.enable = false;
 
     this.cameras.main.shake(300, 0.01);
-    this.cameras.main.fade(150, 255, 0, 0);
+    this.cameras.main.fade(300, 255, 0, 0);
 
-    this.time.delayedCall(1000, () => this.gameOver());
+    this.time.delayedCall(1500, () => this.gameOver());
   }
 
   createUI() {
@@ -706,6 +816,8 @@ export class Game extends Phaser.Scene {
   update() {
     if (!this.player || !this.player.body || this.isDead) return;
 
+    this.checkDoorEntry();
+
     const speed = 100;
     this.player.body.setVelocity(0);
 
@@ -737,6 +849,7 @@ export class Game extends Phaser.Scene {
       score: this.score,
       timeElapsed: timeElapsed,
       timeTravels: this.timeTravelManager.getTravelCount(),
+      deathReason: this.deathReason,
     });
   }
 }

@@ -20,7 +20,7 @@ export class MainMenu extends Phaser.Scene {
         0x0d0617,
         1
       );
-      this.background.fillRect(0, 0, 1280, 720);
+      this.background.fillRect(0, 0, 1920, 1080);
       this.background.setDepth(-1); // Garantir que fica sempre atrás
     }
 
@@ -33,7 +33,7 @@ export class MainMenu extends Phaser.Scene {
 
     // Título do jogo
     const title = this.add
-      .text(640, 150, "VIAGEM NO TEMPO", {
+      .text(960, 150, "VIAGEM NO TEMPO", {
         fontSize: "72px",
         fontFamily: "Arial",
         color: "#00ffff",
@@ -61,7 +61,7 @@ export class MainMenu extends Phaser.Scene {
 
     // Subtítulo
     this.add
-      .text(640, 230, "Escape do Edifício Temporal", {
+      .text(960, 230, "Escape do Edifício Temporal", {
         fontSize: "24px",
         fontFamily: "Arial",
         color: "#ffffff",
@@ -74,29 +74,29 @@ export class MainMenu extends Phaser.Scene {
     const buttonSpacing = 100;
 
     // Botão Inicial
-    this.createMenuButton(640, buttonY, "INICIAL", () => this.showInicial());
+    this.createMenuButton(960, buttonY, "INICIAL", () => this.showInicial());
 
     // Botão Instruções
-    this.createMenuButton(640, buttonY + buttonSpacing, "INSTRUÇÕES", () =>
+    this.createMenuButton(960, buttonY + buttonSpacing, "INSTRUÇÕES", () =>
       this.showInstrucoes()
     );
 
     // Botão Jogar
-    this.createMenuButton(640, buttonY + buttonSpacing * 2, "JOGAR", () =>
+    this.createMenuButton(960, buttonY + buttonSpacing * 2, "JOGAR", () =>
       this.startGame()
     );
   }
 
   createMenuButton(x, y, text, callback) {
     // Fundo do botão
-    const button = this.add.rectangle(x, y, 300, 60, 0x2a1f4a);
-    button.setStrokeStyle(2, 0x00ffff);
+    const button = this.add.rectangle(x, y, 400, 80, 0x2a1f4a);
+    button.setStrokeStyle(3, 0x00ffff);
     button.setInteractive({ useHandCursor: true });
 
     // Texto do botão
     const buttonText = this.add
       .text(x, y, text, {
-        fontSize: "28px",
+        fontSize: "36px",
         fontFamily: "Arial",
         color: "#ffffff",
         fontStyle: "bold",
@@ -132,7 +132,7 @@ export class MainMenu extends Phaser.Scene {
 
     // Título
     this.add
-      .text(640, 80, "SOBRE O JOGO", {
+      .text(960, 80, "SOBRE O JOGO", {
         fontSize: "48px",
         fontFamily: "Arial",
         color: "#00ffff",
@@ -159,7 +159,7 @@ export class MainMenu extends Phaser.Scene {
     let yPos = 180;
     infoText.forEach((line) => {
       this.add
-        .text(640, yPos, line, {
+        .text(960, yPos, line, {
           fontSize: "24px",
           fontFamily: "Arial",
           color: "#ffffff",
@@ -170,7 +170,7 @@ export class MainMenu extends Phaser.Scene {
     });
 
     // Botão voltar
-    this.createMenuButton(640, 620, "VOLTAR", () => this.showMainMenu());
+    this.createMenuButton(960, 620, "VOLTAR", () => this.showMainMenu());
   }
 
   showInstrucoes() {
@@ -179,7 +179,7 @@ export class MainMenu extends Phaser.Scene {
 
     // Título
     this.add
-      .text(640, 80, "INSTRUÇÕES", {
+      .text(960, 80, "INSTRUÇÕES", {
         fontSize: "48px",
         fontFamily: "Arial",
         color: "#00ffff",
@@ -215,7 +215,7 @@ export class MainMenu extends Phaser.Scene {
       const color = line.startsWith("DICA:") ? "#ffff00" : "#ffffff";
 
       this.add
-        .text(640, yPos, line, {
+        .text(960, yPos, line, {
           fontSize: fontSize,
           fontFamily: "Arial",
           color: color,
@@ -227,7 +227,7 @@ export class MainMenu extends Phaser.Scene {
     });
 
     // Botão voltar
-    this.createMenuButton(640, 620, "VOLTAR", () => this.showMainMenu());
+    this.createMenuButton(960, 620, "VOLTAR", () => this.showMainMenu());
   }
 
   startGame() {
@@ -239,7 +239,6 @@ export class MainMenu extends Phaser.Scene {
       this.scene.start("Game");
     });
   }
-
 
   clearScreen() {
     // Remove todos os objetos da cena exceto o fundo (background)

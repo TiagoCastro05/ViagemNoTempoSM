@@ -9,6 +9,7 @@ export class GameOver extends Phaser.Scene {
     this.score = data.score || 0;
     this.timeElapsed = data.timeElapsed || 0;
     this.timeTravels = data.timeTravels || 0;
+    this.deathReason = data.deathReason || "Morreste!";
   }
 
   preload() {
@@ -19,15 +20,15 @@ export class GameOver extends Phaser.Scene {
     // Fundo escuro com efeito de game over
     const graphics = this.add.graphics();
     graphics.fillGradientStyle(0x0d0617, 0x0d0617, 0x1a0515, 0x1a0515, 1);
-    graphics.fillRect(0, 0, 1280, 720);
+    graphics.fillRect(0, 0, 1920, 1080);
 
     // Partículas de fundo para efeito visual
     this.createBackgroundParticles();
 
     // Título GAME OVER
     const gameOverText = this.add
-      .text(640, 100, "GAME OVER", {
-        fontSize: "80px",
+      .text(960, 100, "GAME OVER", {
+        fontSize: "100px",
         fontFamily: "Arial",
         color: "#ff0000",
         stroke: "#000000",
@@ -50,6 +51,27 @@ export class GameOver extends Phaser.Scene {
       scale: { from: 0.5, to: 1 },
       duration: 1000,
       ease: "Bounce.out",
+    });
+
+    // Razão da morte
+    const deathReasonText = this.add
+      .text(960, 220, this.deathReason, {
+        fontSize: "36px",
+        fontFamily: "Arial",
+        color: "#ffaa00",
+        stroke: "#000000",
+        strokeThickness: 4,
+      })
+      .setOrigin(0.5)
+      .setAlpha(0)
+      .setDepth(100);
+
+    this.tweens.add({
+      targets: deathReasonText,
+      alpha: 1,
+      duration: 800,
+      delay: 500,
+      ease: "Power2",
     });
 
     // Efeito de pulsação
@@ -76,8 +98,8 @@ export class GameOver extends Phaser.Scene {
   createBackgroundParticles() {
     // Criar algumas partículas flutuantes no fundo
     for (let i = 0; i < 20; i++) {
-      const x = Phaser.Math.Between(0, 1280);
-      const y = Phaser.Math.Between(0, 720);
+      const x = Phaser.Math.Between(0, 1920);
+      const y = Phaser.Math.Between(0, 1080);
       const size = Phaser.Math.Between(2, 6);
 
       const particle = this.add.circle(x, y, size, 0x00ffff, 0.3);
@@ -97,13 +119,13 @@ export class GameOver extends Phaser.Scene {
 
   createResultsPanel() {
     // Painel com fundo semi-transparente
-    const panel = this.add.rectangle(640, 350, 600, 350, 0x1a0f2e, 0.9);
-    panel.setStrokeStyle(3, 0x00ffff);
+    const panel = this.add.rectangle(960, 500, 800, 450, 0x1a0f2e, 0.9);
+    panel.setStrokeStyle(4, 0x00ffff);
 
     // Título do painel
     this.add
-      .text(640, 220, "RESULTADOS", {
-        fontSize: "40px",
+      .text(960, 340, "RESULTADOS", {
+        fontSize: "50px",
         fontFamily: "Arial",
         color: "#00ffff",
         fontStyle: "bold",
@@ -118,17 +140,16 @@ export class GameOver extends Phaser.Scene {
     // Resultados
     const results = [
       { label: "NÍVEL ALCANÇADO:", value: this.level, color: "#ffff00" },
-      { label: "Pontuação:", value: this.score, color: "#ffffff" },
       { label: "Tempo decorrido:", value: timeFormatted, color: "#ffffff" },
       { label: "Viagens no tempo:", value: this.timeTravels, color: "#00ffff" },
     ];
 
-    let yPos = 280;
+    let yPos = 430;
     results.forEach((result) => {
       // Label
       this.add
-        .text(400, yPos, result.label, {
-          fontSize: result.label.includes("NÍVEL") ? "32px" : "24px",
+        .text(600, yPos, result.label, {
+          fontSize: result.label.includes("NÍVEL") ? "40px" : "32px",
           fontFamily: "Arial",
           color: "#aaaaaa",
           fontStyle: result.label.includes("NÍVEL") ? "bold" : "normal",
@@ -137,43 +158,43 @@ export class GameOver extends Phaser.Scene {
 
       // Valor
       this.add
-        .text(880, yPos, result.value.toString(), {
-          fontSize: result.label.includes("NÍVEL") ? "32px" : "24px",
+        .text(1320, yPos, result.value.toString(), {
+          fontSize: result.label.includes("NÍVEL") ? "40px" : "32px",
           fontFamily: "Arial",
           color: result.color,
           fontStyle: "bold",
         })
         .setOrigin(1, 0.5);
 
-      yPos += result.label.includes("NÍVEL") ? 60 : 45;
+      yPos += result.label.includes("NÍVEL") ? 75 : 60;
     });
   }
 
   createButtons() {
-    const buttonY = 570;
-    const buttonSpacing = 250;
+    const buttonY = 800;
+    const buttonSpacing = 300;
 
     // Botão Jogar Novamente
-    this.createMenuButton(450, buttonY, "JOGAR NOVAMENTE", () =>
+    this.createMenuButton(660, buttonY, "JOGAR NOVAMENTE", () =>
       this.playAgain()
     );
 
     // Botão Menu Principal
-    this.createMenuButton(830, buttonY, "MENU PRINCIPAL", () =>
+    this.createMenuButton(1260, buttonY, "MENU PRINCIPAL", () =>
       this.goToMainMenu()
     );
   }
 
   createMenuButton(x, y, text, callback) {
     // Fundo do botão
-    const button = this.add.rectangle(x, y, 330, 65, 0x2a1f4a);
-    button.setStrokeStyle(2, 0x00ffff);
+    const button = this.add.rectangle(x, y, 440, 85, 0x2a1f4a);
+    button.setStrokeStyle(3, 0x00ffff);
     button.setInteractive({ useHandCursor: true });
 
     // Texto do botão
     const buttonText = this.add
       .text(x, y, text, {
-        fontSize: "24px",
+        fontSize: "32px",
         fontFamily: "Arial",
         color: "#ffffff",
         fontStyle: "bold",
@@ -237,8 +258,8 @@ export class GameOver extends Phaser.Scene {
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
 
     const message = this.add
-      .text(640, 650, randomMessage, {
-        fontSize: "20px",
+      .text(960, 950, randomMessage, {
+        fontSize: "26px",
         fontFamily: "Arial",
         color: "#888888",
         fontStyle: "italic",
