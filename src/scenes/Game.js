@@ -316,9 +316,9 @@ export class Game extends Phaser.Scene {
   }
 
   setupGame() {
-    // Mostrar apenas o passado inicialmente
-    this.futuroBackground?.setVisible(false);
-    this.futuroPrincipal?.setVisible(false);
+    // Mostrar apenas o futuro inicialmente
+    this.passadoBackground?.setVisible(false);
+    this.passadoPrincipal?.setVisible(false);
 
     // Configurar colisões por propriedade
     if (this.passadoPrincipal) {
@@ -392,7 +392,7 @@ export class Game extends Phaser.Scene {
           }
         }
       );
-      this.passadoCollider.active = true; // Ativo no início (começa no passado)
+      this.passadoCollider.active = false; // Inativo no início
     }
     if (this.futuroPrincipal) {
       this.futuroCollider = this.physics.add.collider(
@@ -404,7 +404,7 @@ export class Game extends Phaser.Scene {
           }
         }
       );
-      this.futuroCollider.active = false; // Inativo no início
+      this.futuroCollider.active = true; // Ativo no início (começa no futuro)
     }
 
     this.timeTravelManager = new TimeTravelManager(this);
@@ -617,21 +617,10 @@ export class Game extends Phaser.Scene {
     this.player.setVelocity(0, 0);
     this.player.body.enable = false;
 
-    this.cameras.main.shake(200, 0.01);
-    this.cameras.main.fade(500, 255, 0, 0);
+    this.cameras.main.shake(300, 0.01);
+    this.cameras.main.fade(150, 255, 0, 0);
 
-    const deathText = this.add
-      .text(this.cameras.main.centerX, this.cameras.main.centerY, reason, {
-        fontSize: "32px",
-        color: "#ff0000",
-        backgroundColor: "#000000",
-        padding: { x: 20, y: 10 },
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(200);
-
-    this.time.delayedCall(1500, () => this.gameOver());
+    this.time.delayedCall(1000, () => this.gameOver());
   }
 
   createUI() {

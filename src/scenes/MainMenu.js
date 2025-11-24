@@ -85,25 +85,6 @@ export class MainMenu extends Phaser.Scene {
     this.createMenuButton(640, buttonY + buttonSpacing * 2, "JOGAR", () =>
       this.startGame()
     );
-
-    // Botão TESTE GAME OVER (Temporário - remover depois)
-    const testButton = this.createMenuButton(
-      640,
-      buttonY + buttonSpacing * 3,
-      "🧪 TESTAR GAME OVER",
-      () => this.testGameOver()
-    );
-    testButton.button.setFillStyle(0x4a1f2a); // Cor diferente para indicar que é teste
-    testButton.buttonText.setFontSize("22px");
-
-    // Rodapé com informação adicional
-    this.add
-      .text(640, 680, "Use o mouse para navegar", {
-        fontSize: "18px",
-        fontFamily: "Arial",
-        color: "#888888",
-      })
-      .setOrigin(0.5);
   }
 
   createMenuButton(x, y, text, callback) {
@@ -259,19 +240,6 @@ export class MainMenu extends Phaser.Scene {
     });
   }
 
-  testGameOver() {
-    // Método temporário para testar o ecrã de Game Over
-    this.cameras.main.fadeOut(500, 0, 0, 0);
-
-    this.time.delayedCall(500, () => {
-      this.scene.start("GameOver", {
-        level: 5, // Nível alcançado
-        score: 1250, // Pontuação
-        timeElapsed: 245, // Tempo em segundos (4:05)
-        timeTravels: 12, // Número de viagens no tempo
-      });
-    });
-  }
 
   clearScreen() {
     // Remove todos os objetos da cena exceto o fundo (background)

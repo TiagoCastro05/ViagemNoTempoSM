@@ -5,7 +5,7 @@
 export class TimeTravelManager {
   constructor(scene) {
     this.scene = scene;
-    this.currentTime = "passado"; // 'passado' ou 'futuro'
+    this.currentTime = "futuro"; // 'passado' ou 'futuro'
     this.timeTravels = 0;
 
     // Referências para os layers (serão definidas depois)
