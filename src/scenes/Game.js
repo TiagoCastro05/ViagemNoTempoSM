@@ -530,6 +530,19 @@ export class Game extends Phaser.Scene {
     key.setScale(1);
     key.body.setAllowGravity(false);
 
+    // Seta apontando para a chave
+    const keyArrow = this.add
+      .text(keyPosToUse.x, keyPosToUse.y - 30, "▼", {
+        fontSize: "32px",
+        color: "#ffff00",
+        fontStyle: "bold",
+        stroke: "#000000",
+        strokeThickness: 4,
+      })
+      .setOrigin(0.5)
+      .setDepth(100);
+    key.arrow = keyArrow;
+
     this.tweens.add({
       targets: key,
       y: key.y - 5,
@@ -546,9 +559,20 @@ export class Game extends Phaser.Scene {
       yoyo: true,
       repeat: -1,
     });
+    this.tweens.add({
+      targets: keyArrow,
+      y: keyArrow.y - 8,
+      duration: 500,
+      ease: "Sine.inOut",
+      yoyo: true,
+      repeat: -1,
+    });
   }
 
   collectKey(player, key) {
+    // Destruir indicadores visuais
+    if (key.arrow) key.arrow.destroy();
+
     key.destroy();
     this.keysCollected++;
     this.score += 100;
@@ -601,10 +625,32 @@ export class Game extends Phaser.Scene {
 
       console.log("Porta desbloqueada! Vai até à porta para passar de nível.");
 
+      // Seta apontando para a porta
+      const doorArrow = this.add
+        .text(this.doorPosition.x, this.doorPosition.y - 35, "▼", {
+          fontSize: "36px",
+          color: "#00ff00",
+          fontStyle: "bold",
+          stroke: "#000000",
+          strokeThickness: 4,
+        })
+        .setOrigin(0.5)
+        .setDepth(100);
+      this.doorArrow = doorArrow;
+
+      this.tweens.add({
+        targets: doorArrow,
+        y: doorArrow.y - 8,
+        duration: 500,
+        ease: "Sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+
       // Feedback visual
       const doorText = this.add
-        .text(this.doorPosition.x, this.doorPosition.y - 30, "Porta Aberta!", {
-          fontSize: "16px",
+        .text(this.doorPosition.x, this.doorPosition.y - 60, "Porta Aberta!", {
+          fontSize: "18px",
           color: "#00ff00",
           fontStyle: "bold",
           stroke: "#000000",
@@ -642,6 +688,40 @@ export class Game extends Phaser.Scene {
     if (distance < 20) {
       this.levelCompleting = true;
       this.levelComplete();
+    }
+  }
+
+  checkDeathTiles() {
+    if (this.isDead) return;
+
+    // Obter a época atual do TimeTravelManager
+    const currentTime = this.timeTravelManager.getCurrentTime();
+
+    // Verificar ambas as camadas da época atual (Background e Principal)
+    const layersToCheck =
+      currentTime === "passado"
+        ? [this.passadoBackground, this.passadoPrincipal]
+        : [this.futuroBackground, this.futuroPrincipal];
+
+    for (const layer of layersToCheck) {
+      if (!layer || !layer.visible) continue;
+
+      // Verificar o tile exatamente onde o player está
+      const tileX = layer.worldToTileX(this.player.x);
+      const tileY = layer.worldToTileY(this.player.y);
+      const tile = layer.getTileAt(tileX, tileY);
+
+      // Verificar se o tile existe e tem propriedades
+      if (tile && tile.properties) {
+        // Verificar se tem a propriedade kills (pode ser true ou "true")
+        if (
+          tile.properties.kills === true ||
+          tile.properties.kills === "true"
+        ) {
+          this.playerDeath(this.getDeathMessage(tile.properties.deathType));
+          return;
+        }
+      }
     }
   }
 
@@ -728,7 +808,7 @@ export class Game extends Phaser.Scene {
     this.player.body.enable = false;
 
     this.cameras.main.shake(300, 0.01);
-    this.cameras.main.fade(300, 255, 0, 0);
+    this.cameras.main.fade(1500, 255, 0, 0);
 
     this.time.delayedCall(1500, () => this.gameOver());
   }
@@ -817,6 +897,7 @@ export class Game extends Phaser.Scene {
     if (!this.player || !this.player.body || this.isDead) return;
 
     this.checkDoorEntry();
+    this.checkDeathTiles();
 
     const speed = 100;
     this.player.body.setVelocity(0);

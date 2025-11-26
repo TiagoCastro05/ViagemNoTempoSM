@@ -17,10 +17,6 @@ Problemas:
 Solução:
  a) Dar prioridade ao fundo com 'setDepth(-1)' para ficar sempre atrás e limpar só o que interessa. O clearScreen() agora remove tudo exceto o fundo.
 
- Utilização de IA:
-- utilizei IA para criar os menus porque queria adiantar o relatório com o prototipo de baixa fidelidade (1 ou 2 ecrãs), porque na semana a seguir vou ter 2 testes 
-  e queria despachar-me com isso para ter mais tempo para estudar.
-
 Decisões:
 - Corrigir o problema 2 e fazer resto do jogo
 
@@ -65,9 +61,6 @@ Consolidar código para melhor legibilidade
 ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-
-
-
 Sessão 3 – 24 de novembro de 2025
 
 Objetivo: Fazer com que o player morra ao tocar em certos blocos
@@ -83,4 +76,25 @@ Problemas:
 Solução:
   a) No Tiled, eu fiz com que o proprio chão tivesse a colisão ativa, por isso o era como se o player estive dentro de uma grande parede. Para corrigir só tive que desligar a propriedade "collides" dos tiles do chão
 
+Decisões:
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+Sessão 4 – 26 de novembro de 2025
+
+Objetivo: Fazer com que seja mais obvio o que o jogador tem de fazer
+
+Atividades realizadas:
+Explicar melhor como se joga no menu 'Instruções'
+Quando se morre, demora mais tempo a ficar ecrã vermelho, para ver o porquê de morrer.
+
+
+Problemas:
+  a) 
+
+Solução:
+  a) 
 Decisões:

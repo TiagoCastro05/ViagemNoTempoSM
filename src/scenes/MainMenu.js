@@ -192,15 +192,19 @@ export class MainMenu extends Phaser.Scene {
     const instructions = [
       "COMO JOGAR:",
       "",
-      "• Use as SETAS para mover o personagem",
+      "• Use as SETAS ou WASD para mover o personagem",
       "",
       "• Pressione ESPAÇO para viajar no tempo",
       "",
       "• Encontre caminhos alternativos em diferentes épocas",
       "",
-      "• Resolva puzzles para desbloquear novas áreas",
+      "• Apanha a CHAVE para poder abrir a PORTA de saída",
       "",
       "• Chegue à saída para completar cada nível",
+      "",
+      "• A Água, Lava e Picos MATAM-TE instantaneamente!",
+      "",
+      "• MORRES se ficares preso dentro de paredes ou objetos ao viajar no tempo!",
       "",
       "DICA: Observe bem o ambiente em cada época!",
     ];
@@ -227,7 +231,7 @@ export class MainMenu extends Phaser.Scene {
     });
 
     // Botão voltar
-    this.createMenuButton(960, 620, "VOLTAR", () => this.showMainMenu());
+    this.createMenuButton(960, 820, "VOLTAR", () => this.showMainMenu());
   }
 
   startGame() {
