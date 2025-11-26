@@ -527,52 +527,12 @@ export class Game extends Phaser.Scene {
       "chave_sheet",
       179
     );
-    key.setScale(1);
+    key.setScale(1.5);
     key.body.setAllowGravity(false);
-
-    // Seta apontando para a chave
-    const keyArrow = this.add
-      .text(keyPosToUse.x, keyPosToUse.y - 30, "▼", {
-        fontSize: "32px",
-        color: "#ffff00",
-        fontStyle: "bold",
-        stroke: "#000000",
-        strokeThickness: 4,
-      })
-      .setOrigin(0.5)
-      .setDepth(100);
-    key.arrow = keyArrow;
-
-    this.tweens.add({
-      targets: key,
-      y: key.y - 5,
-      duration: 1000,
-      ease: "Sine.inOut",
-      yoyo: true,
-      repeat: -1,
-    });
-    this.tweens.add({
-      targets: key,
-      alpha: { from: 0.7, to: 1 },
-      duration: 800,
-      ease: "Sine.inOut",
-      yoyo: true,
-      repeat: -1,
-    });
-    this.tweens.add({
-      targets: keyArrow,
-      y: keyArrow.y - 8,
-      duration: 500,
-      ease: "Sine.inOut",
-      yoyo: true,
-      repeat: -1,
-    });
+    key.setDepth(100);
   }
 
   collectKey(player, key) {
-    // Destruir indicadores visuais
-    if (key.arrow) key.arrow.destroy();
-
     key.destroy();
     this.keysCollected++;
     this.score += 100;
@@ -625,36 +585,40 @@ export class Game extends Phaser.Scene {
 
       console.log("Porta desbloqueada! Vai até à porta para passar de nível.");
 
-      // Seta apontando para a porta
-      const doorArrow = this.add
-        .text(this.doorPosition.x, this.doorPosition.y - 35, "▼", {
-          fontSize: "36px",
-          color: "#00ff00",
-          fontStyle: "bold",
-          stroke: "#000000",
-          strokeThickness: 4,
-        })
-        .setOrigin(0.5)
-        .setDepth(100);
-      this.doorArrow = doorArrow;
+      // Criar círculo brilhante verde em volta da porta
+      const doorGlow = this.add.circle(
+        this.doorPosition.x,
+        this.doorPosition.y,
+        12,
+        0x00ff00,
+        0.5
+      );
+      doorGlow.setDepth(50);
+      this.doorGlow = doorGlow;
 
       this.tweens.add({
-        targets: doorArrow,
-        y: doorArrow.y - 8,
-        duration: 500,
+        targets: doorGlow,
+        scale: { from: 1, to: 1.8 },
+        alpha: { from: 0.5, to: 0.8 },
+        duration: 1000,
         ease: "Sine.inOut",
         yoyo: true,
         repeat: -1,
       });
 
+      // Atualizar o texto do objetivo
+      if (this.objectiveText) {
+        this.objectiveText.setText("Objetivo: Sai pela porta");
+      }
+
       // Feedback visual
       const doorText = this.add
-        .text(this.doorPosition.x, this.doorPosition.y - 60, "Porta Aberta!", {
-          fontSize: "18px",
+        .text(this.doorPosition.x, this.doorPosition.y - 30, "Porta Aberta!", {
+          fontSize: "20px",
           color: "#00ff00",
           fontStyle: "bold",
           stroke: "#000000",
-          strokeThickness: 3,
+          strokeThickness: 4,
         })
         .setOrigin(0.5)
         .setDepth(200);
@@ -663,7 +627,7 @@ export class Game extends Phaser.Scene {
         targets: doorText,
         y: doorText.y - 20,
         alpha: 0,
-        duration: 2000,
+        duration: 2500,
         onComplete: () => doorText.destroy(),
       });
     }
@@ -814,55 +778,34 @@ export class Game extends Phaser.Scene {
   }
 
   createUI() {
-    const cam = this.cameras.main;
-    const textStyle = {
-      fontSize: "16px",
-      fontFamily: "Arial",
-      backgroundColor: "#000000aa",
-      padding: { x: 10, y: 5 },
-    };
-
-    this.timeText = this.add
-      .text(16, 16, "", { ...textStyle, color: "#ffffff" })
-      .setScrollFactor(0)
-      .setDepth(100);
-    this.keysText = this.add
-      .text(16, 50, "", { ...textStyle, color: "#ffff00" })
-      .setScrollFactor(0)
-      .setDepth(100);
-    this.scoreText = this.add
-      .text(16, 84, "", { ...textStyle, color: "#00ff00" })
-      .setScrollFactor(0)
-      .setDepth(100);
-    this.instructionsText = this.add
-      .text(
-        cam.width / 2,
-        cam.height - 20,
-        "ESPAÇO: Viajar no Tempo | WASD/Setas: Mover",
-        {
-          fontSize: "14px",
-          fontFamily: "Arial",
-          color: "#ffffff",
-          backgroundColor: "#000000aa",
-          padding: { x: 8, y: 4 },
-        }
-      )
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(100);
-
-    this.updateUI();
+    // Criar texto que segue a câmera
+    this.objectiveText = this.add
+      .text(0, 0, "Objetivo: Encontra a chave", {
+        fontSize: "11px",
+        fontFamily: "Arial",
+        color: "#ffaa00",
+        backgroundColor: "#000000dd",
+        padding: { x: 6, y: 3 },
+      })
+      .setOrigin(1, 0)
+      .setDepth(1000)
+      .setScrollFactor(1);
   }
 
   updateUI() {
-    const currentTime = this.timeTravelManager.getCurrentTime();
-    const timeLabel = currentTime === "passado" ? "PASSADO" : "FUTURO";
-    const timeColor = currentTime === "passado" ? "#00ffff" : "#ff00ff";
+    // Atualizar posição do texto para seguir a câmera
+    if (this.objectiveText && this.cameras.main) {
+      const cam = this.cameras.main;
+      const zoom = cam.zoom;
+      const visibleWidth = cam.width / zoom;
+      const visibleHeight = cam.height / zoom;
 
-    this.timeText.setText(`Época: ${timeLabel}`);
-    this.timeText.setColor(timeColor);
-    this.keysText.setText(`Chaves: ${this.keysCollected}/${this.totalKeys}`);
-    this.scoreText.setText(`Pontos: ${this.score}`);
+      // Posicionar no canto superior direito da área visível
+      this.objectiveText.setPosition(
+        cam.scrollX + visibleWidth - 5,
+        cam.scrollY + 5
+      );
+    }
   }
 
   levelComplete() {
@@ -898,6 +841,7 @@ export class Game extends Phaser.Scene {
 
     this.checkDoorEntry();
     this.checkDeathTiles();
+    this.updateUI(); // Atualizar posição do texto
 
     const speed = 100;
     this.player.body.setVelocity(0);
