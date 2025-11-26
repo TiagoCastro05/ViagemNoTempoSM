@@ -90,11 +90,15 @@ Objetivo: Fazer com que seja mais obvio o que o jogador tem de fazer
 Atividades realizadas:
 Explicar melhor como se joga no menu 'Instruções'
 Quando se morre, demora mais tempo a ficar ecrã vermelho, para ver o porquê de morrer.
+Adicionar um circulo verde á volta da porta quando o jogador apanha a chave.
+Diminuir o setSize do player, para que ele apenas morra quando estiver mesmo a tocar com os tiles mortais
 
 
 Problemas:
-  a) 
+  a) Não consigo fazer com que as chaves tenham algum tipo de indicação de onde estão
 
 Solução:
-  a) 
+  a) Desistir dessa ideia e deixar as chaves como estavam antes 
+
+
 Decisões:

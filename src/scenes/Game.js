@@ -342,8 +342,8 @@ export class Game extends Phaser.Scene {
     // Criar o jogador
     this.player = this.physics.add.sprite(48, 48, "player_walk", 6);
     this.player.setCollideWorldBounds(true);
-    this.player.body.setSize(14, 14);
-    this.player.body.setOffset(1, 1);
+    this.player.body.setSize(12, 12);
+    this.player.body.setOffset(0, 0);
     this.player.setDepth(100);
     this.player.setScale(1);
 
