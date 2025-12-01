@@ -17,6 +17,9 @@ Problemas:
 Solução:
  a) Dar prioridade ao fundo com 'setDepth(-1)' para ficar sempre atrás e limpar só o que interessa. O clearScreen() agora remove tudo exceto o fundo.
 
+Utilização de IA:
+Criação do menu inicial e Game Over
+
 Decisões:
 - Corrigir o problema 2 e fazer resto do jogo
 
@@ -51,6 +54,11 @@ b) Ficheiro Walk.png tinha frames vazios/transparentes. Mudei para RPG_assets.pn
 c) Sistema de spawn aleatório implementado com KeyManager - chave aparece só no tempo correto (passado ou futuro)
 d) Utilizar a propriedade personalizada 'collides' no Tiled para criar as colisões, invés de escrever código para fazer isso
 
+
+Utilização de IA:
+ implementação do sistema de viajar no tempo (Mudar de camadas do ficheiro mapa.json)
+ Ajuda na implementação do sistema de chaves aleatórias
+
 Decisões:
 
 Usar RPG_assets.png como spritesheet principal do personagem
@@ -76,6 +84,10 @@ Problemas:
 Solução:
   a) No Tiled, eu fiz com que o proprio chão tivesse a colisão ativa, por isso o era como se o player estive dentro de uma grande parede. Para corrigir só tive que desligar a propriedade "collides" dos tiles do chão
 
+Utilização de IA:
+Ajuda na parte das mensagens de morte personalizadas e nos tiles mortais.
+
+
 Decisões:
 
 
@@ -100,5 +112,30 @@ Problemas:
 Solução:
   a) Desistir dessa ideia e deixar as chaves como estavam antes 
 
+Utilização de IA:
+ Adicição do circulo verde na porta
+
+Decisões:
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+Sessão 5 – 01 de Dezembro de 2025
+
+Objetivo: otimizar Codigo escrito até agora
+
+Atividades realizadas:
+Remoção de debugs não necessários.
+simplificação de vários metodos
+
+
+Problemas:
+  a) Não consigo fazer com que as chaves tenham algum tipo de indicação de onde estão
+
+Solução:
+  a) Desistir dessa ideia e deixar as chaves como estavam antes 
+
+Utilização de IA:
+ Foi utilizada para facilitar o trabalho de otimização
 
 Decisões:

@@ -13,20 +13,12 @@ export class Key extends Phaser.Physics.Arcade.Sprite {
     // Configurar propriedades
     this.setScale(1);
     this.body.setAllowGravity(false);
-    this.setDepth(50); // Acima das layers mas abaixo do jogador
+    this.setDepth(50);
 
-    // Criar animações visuais
     this.createFloatingAnimation(scene);
     this.createGlowAnimation(scene);
-
-    console.log(
-      `Key criada em (${this.x}, ${this.y}), depth: ${this.depth}, visible: ${this.visible}`
-    );
   }
 
-  /**
-   * Criar animação de flutuação
-   */
   createFloatingAnimation(scene) {
     scene.tweens.add({
       targets: this,
@@ -38,9 +30,6 @@ export class Key extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-  /**
-   * Criar efeito de brilho pulsante
-   */
   createGlowAnimation(scene) {
     scene.tweens.add({
       targets: this,
@@ -52,20 +41,14 @@ export class Key extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-  /**
-   * Método chamado quando a chave é coletada
-   */
   collect() {
-    // Efeito visual antes de destruir
     this.scene.tweens.add({
       targets: this,
       scale: 2,
       alpha: 0,
       duration: 300,
       ease: "Power2",
-      onComplete: () => {
-        this.destroy();
-      },
+      onComplete: () => this.destroy(),
     });
   }
 }
