@@ -299,8 +299,11 @@ export class GameOver extends Phaser.Scene {
       this.musicaGameOver.stop();
     }
 
-    // Reiniciar música do menu
-    const menuMusic = this.sound.add("menuMusic", { volume: 0.3, loop: true });
+    // Reiniciar música do menu (verificar se já existe)
+    let menuMusic = this.sound.get("menuMusic");
+    if (!menuMusic) {
+      menuMusic = this.sound.add("menuMusic", { volume: 0.3, loop: true });
+    }
     menuMusic.play();
 
     // Efeito de transição
