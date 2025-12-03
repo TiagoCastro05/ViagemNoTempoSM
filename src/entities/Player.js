@@ -1,8 +1,18 @@
 /**
- * Classe Player - Controla o personagem jogável
- * Responsável por: movimento, animações, e propriedades físicas do jogador
+ * Classe Player - Entidade do personagem jogável
+ * Responsável por: movimento, animações, propriedades físicas
+ * Herda de Phaser.Physics.Arcade.Sprite para física automática
+ *
+ * NOTA: Esta classe foi criada mas o jogo atualmente usa sprite direto no Game.js
+ * Mantida para possível uso futuro e organização do código
  */
 export class Player extends Phaser.Physics.Arcade.Sprite {
+  /**
+   * Construtor do jogador
+   * @param {Phaser.Scene} scene - Cena onde o jogador será criado
+   * @param {number} x - Posição X inicial
+   * @param {number} y - Posição Y inicial
+   */
   constructor(scene, x, y) {
     super(scene, x, y, "player_walk");
 
@@ -11,35 +21,30 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     // Configurar propriedades físicas
-    this.setCollideWorldBounds(true);
-    this.body.setSize(20, 24);
-    this.body.setOffset(10, 12);
-    this.setDepth(100);
-    this.setScale(0.5); // 48px * 0.5 = 24px (mais visível)
+    this.setCollideWorldBounds(true); // Não sai dos limites do mundo
+    this.body.setSize(20, 24); // Hitbox do corpo
+    this.body.setOffset(10, 12); // Offset da hitbox
+    this.setDepth(100); // Aparecer acima de tudo
+    this.setScale(0.5); // 48px * 0.5 = 24px (tamanho visual)
 
-    // Velocidades
-    this.walkSpeed = 120;
+    // Configurações de velocidade
+    this.walkSpeed = 120; // Pixels por segundo
 
     // Criar animações
     this.createAnimations();
 
-    // Iniciar com animação walk
+    // Iniciar com animação padrão
     this.play("walk");
-
-    console.log("Jogador criado:", this.x, this.y, "depth:", this.depth);
-    console.log("Sprite visível:", this.visible, "alpha:", this.alpha);
-    console.log("Texture:", this.texture.key, "frame:", this.frame.name);
-    console.log("Scale:", this.scaleX, this.scaleY);
-    console.log("Tint:", this.tint);
   }
 
   /**
    * Criar todas as animações do personagem
+   * Verifica se já existe para evitar duplicação
    */
   createAnimations() {
     const scene = this.scene;
 
-    // Verificar se a animação já existe para não duplicar
+    // Criar animação de caminhada (se não existir)
     if (!scene.anims.exists("walk")) {
       scene.anims.create({
         key: "walk",
@@ -47,48 +52,44 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           start: 0,
           end: 7,
         }),
-        frameRate: 10,
-        repeat: -1,
+        frameRate: 10, // 10 frames por segundo
+        repeat: -1, // Loop infinito
       });
     }
   }
 
   /**
    * Atualizar movimento do jogador baseado no input
-   * @param {Object} cursors - Teclas direcionais
+   * @param {Object} cursors - Teclas direcionais (cursor keys)
    * @param {Object} wasd - Teclas WASD
-   * @param {Boolean} isRunning - Se está pressionando Shift
    */
-  updateMovement(cursors, wasd, isRunning) {
-    const currentSpeed = isRunning ? this.runSpeed : this.walkSpeed;
-
-    // Resetar velocidade
+  updateMovement(cursors, wasd) {
+    // Resetar velocidade (para de mover se não pressionar nada)
     this.setVelocity(0, 0);
 
     let isMoving = false;
 
     // Movimento horizontal
     if (cursors.left.isDown || wasd.left.isDown) {
-      this.setVelocityX(-currentSpeed);
-      this.setFlipX(true);
+      this.setVelocityX(-this.walkSpeed);
+      this.setFlipX(true); // Virar sprite para esquerda
       isMoving = true;
     } else if (cursors.right.isDown || wasd.right.isDown) {
-      this.setVelocityX(currentSpeed);
-      this.setFlipX(false);
+      this.setVelocityX(this.walkSpeed);
+      this.setFlipX(false); // Virar sprite para direita
       isMoving = true;
     }
 
     // Movimento vertical
     if (cursors.up.isDown || wasd.up.isDown) {
-      this.setVelocityY(-currentSpeed);
+      this.setVelocityY(-this.walkSpeed);
       isMoving = true;
     } else if (cursors.down.isDown || wasd.down.isDown) {
-      this.setVelocityY(currentSpeed);
+      this.setVelocityY(this.walkSpeed);
       isMoving = true;
     }
 
-    // Atualizar animação baseado no movimento
-    // Sempre toca a animação walk
+    // Tocar animação de caminhada (sempre ativa)
     this.play("walk", true);
   }
 }

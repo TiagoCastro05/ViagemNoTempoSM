@@ -1,46 +1,44 @@
 import { Key } from "../entities/Key.js";
 
 /**
- * Classe KeyManager - Gerencia o spawn e controle das chaves
- * Responsável por: posicionamento aleatório, spawn único entre passado/futuro
+ * Classe KeyManager - Gerencia o spawn e controle das chaves colecionáveis
+ * Responsável por: posicionamento aleatório controlado, spawn único entre passado/futuro
+ * Implementa aleatoriedade controlada: chave aparece em apenas 1 época aleatória
  */
 export class KeyManager {
   constructor(scene, map) {
     this.scene = scene;
     this.map = map;
 
-    // Grupo de física para as chaves
+    // Grupo de física para as chaves (facilita colisões)
     this.keysGroup = scene.physics.add.group();
 
-    // Armazenar época e posição da chave (definido no início do jogo)
-    this.keyTime = null; // 'passado' ou 'futuro'
-    this.keyPosition = null; // {x, y}
-    this.keyFrame = 179; // Frame do spritesheet
+    // Armazenar época e posição da chave (definido aleatoriamente no início)
+    this.keyTime = null; // 'passado' ou 'futuro' (escolhido aleatoriamente)
+    this.keyPosition = null; // {x, y} (posição específica)
+    this.keyFrame = 179; // Frame do spritesheet da chave
   }
 
   /**
    * Spawnar chave baseado no tempo atual
-   * Se é a primeira vez, escolhe aleatoriamente entre passado/futuro
+   * Chave só aparece no tempo correto (passado OU futuro)
+   * Se é a primeira vez, escolhe aleatoriamente a época e posição
+   * @param {string} currentTime - Tempo atual ('passado' ou 'futuro')
    */
   spawnKeys(currentTime) {
-    // Limpar chaves existentes
+    // Limpar chaves existentes antes de spawnar novas
     this.keysGroup.clear(true, true);
 
-    // Se a chave já foi definida, usar os valores salvos
-    let keyTimeToUse = this.keyTime;
-    let keyPosToUse = this.keyPosition;
-
-    // Se é a primeira vez (início do jogo), escolher aleatoriamente
-    if (!keyTimeToUse || !keyPosToUse) {
+    // Se a chave ainda não foi definida, escolher aleatoriamente
+    if (!this.keyTime || !this.keyPosition) {
       this.chooseRandomKeyLocation();
-      keyTimeToUse = this.keyTime;
-      keyPosToUse = this.keyPosition;
     }
 
     // Só criar a chave se estivermos no tempo correto
-    if (currentTime !== keyTimeToUse) {
+    // (implementa o puzzle: jogador precisa viajar no tempo para encontrar a chave)
+    if (currentTime !== this.keyTime) {
       console.log(
-        `Chave está no ${keyTimeToUse}, mas estamos no ${currentTime}`
+        `Chave está no ${this.keyTime}, mas estamos no ${currentTime}`
       );
       return;
     }
@@ -48,28 +46,31 @@ export class KeyManager {
     // Criar a chave na posição definida
     const key = new Key(
       this.scene,
-      keyPosToUse.x,
-      keyPosToUse.y,
+      this.keyPosition.x,
+      this.keyPosition.y,
       this.keyFrame
     );
     this.keysGroup.add(key);
 
     console.log(
-      `Chave criada no ${currentTime} em (${keyPosToUse.x}, ${keyPosToUse.y})`
+      `Chave criada no ${currentTime} em (${this.keyPosition.x}, ${this.keyPosition.y})`
     );
   }
 
   /**
    * Escolher aleatoriamente a localização da chave
+   * ALEATORIEDADE CONTROLADA:
+   * - Escolhe 1 época aleatória (passado ou futuro)
+   * - Escolhe 1 posição aleatória entre os spawn points válidos
+   * - Garante que sempre há uma solução possível
    */
   chooseRandomKeyLocation() {
-    // Escolher aleatoriamente entre passado e futuro
-    const randomTime = Phaser.Math.Between(0, 1) === 0 ? "passado" : "futuro";
-    this.keyTime = randomTime;
+    // Escolher aleatoriamente entre passado e futuro (50% cada)
+    this.keyTime = Phaser.Math.Between(0, 1) === 0 ? "passado" : "futuro";
 
-    // Obter spawn points do tempo escolhido
+    // Obter layer de spawn points do tempo escolhido
     const objectLayerName =
-      randomTime === "passado" ? "chaves passado" : "chaves futuro";
+      this.keyTime === "passado" ? "chaves passado" : "chaves futuro";
     const objectLayer = this.map.getObjectLayer(objectLayerName);
 
     if (!objectLayer) {
@@ -77,13 +78,10 @@ export class KeyManager {
       return;
     }
 
-    // Coletar todos os spawn points válidos
-    const validSpawnPoints = [];
-    objectLayer.objects.forEach((obj) => {
-      if (obj.type === "item" || obj.name.includes("spawn_key")) {
-        validSpawnPoints.push(obj);
-      }
-    });
+    // Coletar todos os spawn points válidos da época escolhida
+    const validSpawnPoints = objectLayer.objects.filter(
+      (obj) => obj.type === "item" || obj.name.includes("spawn_key")
+    );
 
     if (validSpawnPoints.length === 0) {
       console.warn("Nenhum spawn point encontrado");
@@ -96,12 +94,13 @@ export class KeyManager {
     this.keyPosition = { x: selectedSpawn.x, y: selectedSpawn.y };
 
     console.log(
-      `Chave aparecerá no ${randomTime} na posição (${this.keyPosition.x}, ${this.keyPosition.y})`
+      `Chave aparecerá no ${this.keyTime} na posição (${this.keyPosition.x}, ${this.keyPosition.y})`
     );
   }
 
   /**
    * Resetar o manager para um novo jogo
+   * Limpa época e posição, permitindo nova aleatoriedade
    */
   reset() {
     this.keyTime = null;
@@ -111,6 +110,7 @@ export class KeyManager {
 
   /**
    * Obter o grupo de chaves para configurar colisões
+   * @returns {Phaser.Physics.Arcade.Group} Grupo de física das chaves
    */
   getGroup() {
     return this.keysGroup;

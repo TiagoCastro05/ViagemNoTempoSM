@@ -1,0 +1,64 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "Imagem_Menu.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "Futuro_Menu2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Futuro_menu.tsx": {
+            "scaleInDock": 3,
+            "scaleInEditor": 1
+        },
+        "Imagem_Menu.tmx": {
+            "scale": 3.77625,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 218.33829857663022,
+                "y": 159.5498179410791
+            }
+        },
+        "Imagem_Menu.tmx#Futuro_Menu": {
+            "scaleInDock": 3
+        },
+        "Imagem_Menu.tmx#Futuro_Menu2": {
+            "scaleInDock": 2
+        },
+        "Imagem_Menu.tmx#Futuro_Menu3": {
+            "scaleInDock": 3
+        },
+        "Imagem_Menu.tmx#Passado_Menu": {
+            "scaleInDock": 4
+        },
+        "Passado_Menu.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "C:/xampp/htdocs/SM/VIAGEMNOTEMPO/ViagemNoTempo/assets/mapa/Futuro/futuro",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "openFiles": [
+        "Imagem_Menu.tmx"
+    ],
+    "project": "Menu Imagem.tiled-project",
+    "recentFiles": [
+        "Imagem_Menu.tmx",
+        "Futuro_Menu2.tsx",
+        "Passado_Menu.tsx",
+        "Futuro_menu.tsx"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}

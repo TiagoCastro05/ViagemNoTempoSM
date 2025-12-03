@@ -170,13 +170,15 @@ Decisões:
 
 Sessão 7 – 03 de Dezembro de 2025
 
-Objetivo: implementar alguns requsitos adicionais
+Objetivo: 
+implementar alguns requsitos adicionais
 
 Atividades realizadas:
   Imagem de fundo do menu incial foi alterada
   implementação de alguns requesitos adicionais:
       -> Barra de Progresso
       -> Configurações de audio (Música/efeito Sonoro)
+  Otimização do codigo e adição de comentários
 
 
 Problemas:
@@ -187,5 +189,6 @@ Solução:
 
 Utilização de IA:
 -> Na criação da barra de Progresso
+-> Otimização do codigo
 
 Decisões:
