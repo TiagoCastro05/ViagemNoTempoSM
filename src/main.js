@@ -1,4 +1,6 @@
+import { Preloader } from "./scenes/Preloader.js";
 import { MainMenu } from "./scenes/MainMenu.js";
+import { Settings } from "./scenes/Settings.js";
 import { Game } from "./scenes/Game.js";
 import { GameOver } from "./scenes/GameOver.js";
 
@@ -11,7 +13,7 @@ const config = {
   height: 1080,
   backgroundColor: "#000000",
   pixelArt: true,
-  scene: [MainMenu, Game, GameOver],
+  scene: [Preloader, MainMenu, Settings, Game, GameOver],
   physics: {
     default: "arcade",
     arcade: {

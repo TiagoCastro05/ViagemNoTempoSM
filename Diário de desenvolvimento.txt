@@ -130,10 +130,10 @@ simplificação de vários metodos
 
 
 Problemas:
-  a) Não consigo fazer com que as chaves tenham algum tipo de indicação de onde estão
+  
 
 Solução:
-  a) Desistir dessa ideia e deixar as chaves como estavam antes 
+
 
 Utilização de IA:
  Foi utilizada para facilitar o trabalho de otimização
@@ -154,12 +154,38 @@ Implementação de efeitos sonoros e musicas
 
 
 Problemas:
-  A musica continua a tocar quando o jogador morre pela segunda vez, sendo que ela deveria parar sempre que ele morra.
+
 
 Solução:
  
 
 Utilização de IA:
  
+
+Decisões:
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+Sessão 7 – 03 de Dezembro de 2025
+
+Objetivo: implementar alguns requsitos adicionais
+
+Atividades realizadas:
+  Imagem de fundo do menu incial foi alterada
+  implementação de alguns requesitos adicionais:
+      -> Barra de Progresso
+      -> Configurações de audio (Música/efeito Sonoro)
+
+
+Problemas:
+
+
+Solução:
+ 
+
+Utilização de IA:
+-> Na criação da barra de Progresso
 
 Decisões:

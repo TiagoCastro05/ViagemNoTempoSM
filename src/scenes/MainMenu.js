@@ -1,22 +1,11 @@
+import { settingsManager } from "../managers/SettingsManager.js";
+
 export class MainMenu extends Phaser.Scene {
   constructor() {
     super("MainMenu");
     this.currentView = "menu";
     this.background = null;
     this.musicaMenu = null;
-  }
-
-  preload() {
-    // Carregar imagem de fundo
-    this.load.image("menuBackground", "assets/Imagem/MenuInicial.png");
-
-    // Carregar sons
-    this.load.audio("menuMusic", "assets/audio/Menu.mp3");
-    this.load.audio("keyCollect", "assets/audio/Key.mp3");
-    this.load.audio("timeTravel", "assets/audio/ViajarTempo.mp3");
-    this.load.audio("damage", "assets/audio/dano.mp3");
-    this.load.audio("levelComplete", "assets/audio/NivelConcluido.mp3");
-    this.load.audio("gameOverMusic", "assets/audio/GameOverMenu.mp3");
   }
 
   create() {
@@ -30,9 +19,12 @@ export class MainMenu extends Phaser.Scene {
       // Se a música ainda não existe, criar
       if (!this.musicaMenu) {
         this.musicaMenu = this.sound.add("menuMusic", {
-          volume: 0.3,
+          volume: settingsManager.getMusicVolume(),
           loop: true,
         });
+      } else {
+        // Atualizar volume se as configurações mudaram
+        this.musicaMenu.setVolume(settingsManager.getMusicVolume());
       }
 
       // Se a música existe mas não está a tocar, tocar
@@ -98,8 +90,16 @@ export class MainMenu extends Phaser.Scene {
       this.showInstrucoes()
     );
 
+    // Botão Configurações
+    this.createMenuButton(
+      960,
+      buttonY + buttonSpacing * 2,
+      "CONFIGURAÇÕES",
+      () => this.scene.start("Settings")
+    );
+
     // Botão Jogar
-    this.createMenuButton(960, buttonY + buttonSpacing * 2, "JOGAR", () =>
+    this.createMenuButton(960, buttonY + buttonSpacing * 3, "JOGAR", () =>
       this.startGame()
     );
   }

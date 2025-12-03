@@ -1,3 +1,5 @@
+import { settingsManager } from "../managers/SettingsManager.js";
+
 export class GameOver extends Phaser.Scene {
   constructor() {
     super("GameOver");
@@ -28,7 +30,7 @@ export class GameOver extends Phaser.Scene {
     // (dá tempo para o som de dano terminar)
     this.time.delayedCall(300, () => {
       this.musicaGameOver = this.sound.add("gameOverMusic", {
-        volume: 0.3,
+        volume: settingsManager.getMusicVolume(),
         loop: true,
       });
       this.musicaGameOver.play();
@@ -302,7 +304,10 @@ export class GameOver extends Phaser.Scene {
     // Reiniciar música do menu (verificar se já existe)
     let menuMusic = this.sound.get("menuMusic");
     if (!menuMusic) {
-      menuMusic = this.sound.add("menuMusic", { volume: 0.3, loop: true });
+      menuMusic = this.sound.add("menuMusic", {
+        volume: settingsManager.getMusicVolume(),
+        loop: true,
+      });
     }
     menuMusic.play();
 

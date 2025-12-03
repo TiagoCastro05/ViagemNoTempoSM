@@ -1,5 +1,6 @@
 import { KeyManager } from "../managers/KeyManager.js";
 import { TimeTravelManager } from "../managers/TimeTravelManager.js";
+import { settingsManager } from "../managers/SettingsManager.js";
 
 export class Game extends Phaser.Scene {
   constructor() {
@@ -178,7 +179,7 @@ export class Game extends Phaser.Scene {
   }
   collectKey(player, key) {
     key.destroy();
-    this.sound.play("keyCollect", { volume: 0.5 });
+    this.sound.play("keyCollect", { volume: settingsManager.getSfxVolume() });
     this.keysCollected++;
     this.score += 100;
 
@@ -317,7 +318,7 @@ export class Game extends Phaser.Scene {
     return messages[deathType] || "Morreste!";
   }
   timeTravel() {
-    this.sound.play("timeTravel", { volume: 0.4 });
+    this.sound.play("timeTravel", { volume: settingsManager.getSfxVolume() });
     const newTime = this.timeTravelManager.travel();
     const isPassado = newTime === "passado";
 
@@ -350,7 +351,9 @@ export class Game extends Phaser.Scene {
     }
 
     // Tocar som de dano
-    const somDano = this.sound.add("damage", { volume: 0.6 });
+    const somDano = this.sound.add("damage", {
+      volume: settingsManager.getSfxVolume(),
+    });
     somDano.play();
 
     this.deathReason = reason;
@@ -390,7 +393,9 @@ export class Game extends Phaser.Scene {
   }
 
   levelComplete() {
-    this.sound.play("levelComplete", { volume: 0.5 });
+    this.sound.play("levelComplete", {
+      volume: settingsManager.getSfxVolume(),
+    });
     this.physics.pause();
 
     const cam = this.cameras.main;
