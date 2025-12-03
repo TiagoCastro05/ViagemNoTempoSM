@@ -139,3 +139,27 @@ Utilização de IA:
  Foi utilizada para facilitar o trabalho de otimização
 
 Decisões:
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+Sessão 6 – 02 de Dezembro de 2025
+
+Objetivo: implementar audio no jogo
+
+Atividades realizadas:
+Implementação de efeitos sonoros e musicas
+
+
+Problemas:
+  A musica continua a tocar quando o jogador morre pela segunda vez, sendo que ela deveria parar sempre que ele morra.
+
+Solução:
+ 
+
+Utilização de IA:
+ 
+
+Decisões:

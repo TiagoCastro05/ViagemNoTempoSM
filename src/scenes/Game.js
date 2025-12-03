@@ -44,8 +44,13 @@ export class Game extends Phaser.Scene {
       "assets/personagem/RPG_assets.png",
       spriteConfig
     );
-  }
 
+    // Carregar sons
+    this.load.audio("keyCollect", "assets/audio/Key.mp3");
+    this.load.audio("timeTravel", "assets/audio/ViajarTempo.mp3");
+    this.load.audio("damage", "assets/audio/dano.mp3");
+    this.load.audio("levelComplete", "assets/audio/NivelConcluido.mp3");
+  }
   create() {
     Object.assign(this, {
       keysCollected: 0,
@@ -171,9 +176,9 @@ export class Game extends Phaser.Scene {
     );
     this.keySpace.on("down", () => this.timeTravel());
   }
-
   collectKey(player, key) {
     key.destroy();
+    this.sound.play("keyCollect", { volume: 0.5 });
     this.keysCollected++;
     this.score += 100;
 
@@ -311,8 +316,8 @@ export class Game extends Phaser.Scene {
     };
     return messages[deathType] || "Morreste!";
   }
-
   timeTravel() {
+    this.sound.play("timeTravel", { volume: 0.4 });
     const newTime = this.timeTravelManager.travel();
     const isPassado = newTime === "passado";
 
@@ -334,10 +339,20 @@ export class Game extends Phaser.Scene {
     if (tile?.properties.collides)
       this.playerDeath("Ficaste preso numa parede!");
   }
-
   playerDeath(reason = "Morreu!") {
     if (this.isDead) return;
     this.isDead = true;
+
+    // Parar música do menu
+    const menuMusic = this.sound.get("menuMusic");
+    if (menuMusic) {
+      menuMusic.stop();
+    }
+
+    // Tocar som de dano
+    const somDano = this.sound.add("damage", { volume: 0.6 });
+    somDano.play();
+
     this.deathReason = reason;
 
     this.player.setVelocity(0, 0);
@@ -346,7 +361,9 @@ export class Game extends Phaser.Scene {
     this.cameras.main.shake(300, 0.01);
     this.cameras.main.fade(1500, 255, 0, 0);
 
-    this.time.delayedCall(1500, () => this.gameOver());
+    // Aguardar som de dano terminar + animação antes de ir para Game Over
+    const delayTotal = Math.max(1500, somDano.duration * 1000);
+    this.time.delayedCall(delayTotal, () => this.gameOver());
   }
 
   createUI() {
@@ -373,6 +390,7 @@ export class Game extends Phaser.Scene {
   }
 
   levelComplete() {
+    this.sound.play("levelComplete", { volume: 0.5 });
     this.physics.pause();
 
     const cam = this.cameras.main;

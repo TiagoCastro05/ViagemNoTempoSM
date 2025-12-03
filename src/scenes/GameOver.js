@@ -1,6 +1,7 @@
 export class GameOver extends Phaser.Scene {
   constructor() {
     super("GameOver");
+    this.musicaGameOver = null;
   }
 
   init(data) {
@@ -13,10 +14,26 @@ export class GameOver extends Phaser.Scene {
   }
 
   preload() {
-    // Carregar assets se necessário
+    this.load.audio("gameOverMusic", "assets/audio/GameOverMenu.mp3");
   }
 
   create() {
+    // Parar música do menu (mantém sons de efeito)
+    const menuMusic = this.sound.get("menuMusic");
+    if (menuMusic) {
+      menuMusic.stop();
+    }
+
+    // Aguardar um momento antes de iniciar música de Game Over
+    // (dá tempo para o som de dano terminar)
+    this.time.delayedCall(300, () => {
+      this.musicaGameOver = this.sound.add("gameOverMusic", {
+        volume: 0.3,
+        loop: true,
+      });
+      this.musicaGameOver.play();
+    });
+
     // Fundo escuro com efeito de game over
     const graphics = this.add.graphics();
     graphics.fillGradientStyle(0x0d0617, 0x0d0617, 0x1a0515, 0x1a0515, 1);
@@ -277,6 +294,15 @@ export class GameOver extends Phaser.Scene {
   }
 
   playAgain() {
+    // Parar música de Game Over
+    if (this.musicaGameOver) {
+      this.musicaGameOver.stop();
+    }
+
+    // Reiniciar música do menu
+    const menuMusic = this.sound.add("menuMusic", { volume: 0.3, loop: true });
+    menuMusic.play();
+
     // Efeito de transição
     this.cameras.main.fadeOut(500, 0, 0, 0);
 
@@ -287,6 +313,11 @@ export class GameOver extends Phaser.Scene {
   }
 
   goToMainMenu() {
+    // Parar música de Game Over
+    if (this.musicaGameOver) {
+      this.musicaGameOver.stop();
+    }
+
     // Efeito de transição
     this.cameras.main.fadeOut(500, 0, 0, 0);
 

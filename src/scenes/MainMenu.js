@@ -1,27 +1,48 @@
 export class MainMenu extends Phaser.Scene {
   constructor() {
     super("MainMenu");
-    this.currentView = "menu"; // 'menu', 'inicial', 'instrucoes'
-    this.background = null; // Referência ao fundo
+    this.currentView = "menu";
+    this.background = null;
+    this.musicaMenu = null;
   }
 
   preload() {
-    // Aqui você pode carregar imagens de fundo ou assets específicos do menu
+    // Carregar sons
+    this.load.audio("menuMusic", "assets/audio/Menu.mp3");
+    this.load.audio("keyCollect", "assets/audio/Key.mp3");
+    this.load.audio("timeTravel", "assets/audio/ViajarTempo.mp3");
+    this.load.audio("damage", "assets/audio/dano.mp3");
+    this.load.audio("levelComplete", "assets/audio/NivelConcluido.mp3");
+    this.load.audio("gameOverMusic", "assets/audio/GameOverMenu.mp3");
   }
 
   create() {
-    // Fundo com gradiente escuro para dar atmosfera de mistério (criado apenas uma vez)
-    if (!this.background) {
-      this.background = this.add.graphics();
-      this.background.fillGradientStyle(
-        0x1a0f2e,
-        0x1a0f2e,
-        0x0d0617,
-        0x0d0617,
-        1
-      );
-      this.background.fillRect(0, 0, 1920, 1080);
-      this.background.setDepth(-1); // Garantir que fica sempre atrás
+    // Fundo com gradiente escuro (recriar sempre)
+    this.background = this.add.graphics();
+    this.background.fillGradientStyle(
+      0x1a0f2e,
+      0x1a0f2e,
+      0x0d0617,
+      0x0d0617,
+      1
+    );
+    this.background.fillRect(0, 0, 1920, 1080);
+    this.background.setDepth(-1);
+
+    // Verificar se precisa reiniciar a música
+    if (this.sound.context && this.sound.context.state !== "suspended") {
+      // Se a música ainda não existe, criar
+      if (!this.musicaMenu) {
+        this.musicaMenu = this.sound.add("menuMusic", {
+          volume: 0.3,
+          loop: true,
+        });
+      }
+
+      // Se a música existe mas não está a tocar, tocar
+      if (this.musicaMenu && !this.musicaMenu.isPlaying) {
+        this.musicaMenu.play();
+      }
     }
 
     this.showMainMenu();
@@ -116,6 +137,24 @@ export class MainMenu extends Phaser.Scene {
 
     button.on("pointerdown", () => {
       button.setFillStyle(0x1a0f2e);
+
+      // Iniciar música no primeiro clique (após unlock)
+      if (!this.musicaMenu) {
+        // Garantir que o contexto está ativo
+        const startMusic = () => {
+          this.musicaMenu = this.sound.add("menuMusic", {
+            volume: 0.3,
+            loop: true,
+          });
+          this.musicaMenu.play();
+        };
+
+        if (this.sound.context && this.sound.context.state === "suspended") {
+          this.sound.context.resume().then(startMusic);
+        } else {
+          startMusic();
+        }
+      }
     });
 
     button.on("pointerup", () => {
@@ -235,6 +274,7 @@ export class MainMenu extends Phaser.Scene {
   }
 
   startGame() {
+    // Música do menu continua a tocar durante o jogo
     // Efeito de transição
     this.cameras.main.fadeOut(500, 0, 0, 0);
 
@@ -246,11 +286,10 @@ export class MainMenu extends Phaser.Scene {
 
   clearScreen() {
     // Remove todos os objetos da cena exceto o fundo (background)
-    // Criar uma cópia do array para evitar problemas ao destruir durante iteração
     const children = [...this.children.list];
     children.forEach((child) => {
       // Não destruir o fundo
-      if (child !== this.background) {
+      if (child !== this.background && child.type !== "Graphics") {
         child.destroy();
       }
     });
