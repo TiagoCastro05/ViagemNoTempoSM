@@ -7,6 +7,9 @@ export class MainMenu extends Phaser.Scene {
   }
 
   preload() {
+    // Carregar imagem de fundo
+    this.load.image("menuBackground", "assets/Imagem/MenuInicial.png");
+
     // Carregar sons
     this.load.audio("menuMusic", "assets/audio/Menu.mp3");
     this.load.audio("keyCollect", "assets/audio/Key.mp3");
@@ -17,16 +20,9 @@ export class MainMenu extends Phaser.Scene {
   }
 
   create() {
-    // Fundo com gradiente escuro (recriar sempre)
-    this.background = this.add.graphics();
-    this.background.fillGradientStyle(
-      0x1a0f2e,
-      0x1a0f2e,
-      0x0d0617,
-      0x0d0617,
-      1
-    );
-    this.background.fillRect(0, 0, 1920, 1080);
+    // Fundo com imagem
+    this.background = this.add.image(960, 540, "menuBackground");
+    this.background.setDisplaySize(1920, 1080);
     this.background.setDepth(-1);
 
     // Verificar se precisa reiniciar a música
@@ -169,6 +165,10 @@ export class MainMenu extends Phaser.Scene {
     this.clearScreen();
     this.currentView = "inicial";
 
+    // Fundo escuro semi-transparente para melhorar legibilidade
+    const overlay = this.add.rectangle(960, 400, 1400, 700, 0x000000, 0.75);
+    overlay.setDepth(0);
+
     // Título
     this.add
       .text(960, 80, "SOBRE O JOGO", {
@@ -178,7 +178,8 @@ export class MainMenu extends Phaser.Scene {
         stroke: "#000000",
         strokeThickness: 4,
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(1);
 
     // Conteúdo informativo
     const infoText = [
@@ -204,7 +205,8 @@ export class MainMenu extends Phaser.Scene {
           color: "#ffffff",
           align: "center",
         })
-        .setOrigin(0.5);
+        .setOrigin(0.5)
+        .setDepth(1);
       yPos += 35;
     });
 
@@ -216,6 +218,10 @@ export class MainMenu extends Phaser.Scene {
     this.clearScreen();
     this.currentView = "instrucoes";
 
+    // Fundo escuro semi-transparente para melhorar legibilidade
+    const overlay = this.add.rectangle(960, 500, 1500, 900, 0x000000, 0.75);
+    overlay.setDepth(0);
+
     // Título
     this.add
       .text(960, 80, "INSTRUÇÕES", {
@@ -225,7 +231,8 @@ export class MainMenu extends Phaser.Scene {
         stroke: "#000000",
         strokeThickness: 4,
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(1);
 
     // Instruções
     const instructions = [
@@ -265,7 +272,8 @@ export class MainMenu extends Phaser.Scene {
           align: "center",
           fontStyle: line.endsWith(":") ? "bold" : "normal",
         })
-        .setOrigin(0.5);
+        .setOrigin(0.5)
+        .setDepth(1);
       yPos += line === "" ? 20 : 35;
     });
 
