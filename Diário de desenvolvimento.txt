@@ -57,7 +57,7 @@ d) Utilizar a propriedade personalizada 'collides' no Tiled para criar as colis�
 
 Utilização de IA:
  implementação do sistema de viajar no tempo (Mudar de camadas do ficheiro mapa.json)
- Ajuda na implementação do sistema de chaves aleatórias
+ 
 
 Decisões:
 
@@ -113,7 +113,7 @@ Solução:
   a) Desistir dessa ideia e deixar as chaves como estavam antes 
 
 Utilização de IA:
- Adicição do circulo verde na porta
+ 
 
 Decisões:
 
@@ -182,10 +182,10 @@ Atividades realizadas:
 
 
 Problemas:
-
+  a) O jogador não conseguia passar de nivel depois da primeira tentativa
 
 Solução:
- 
+ a) a variavel do nivel concluido (levelCompleting) não estava a ser resetada sempre que havia uma nova tentativa.
 
 Utilização de IA:
 -> Na criação da barra de Progresso

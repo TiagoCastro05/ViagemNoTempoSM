@@ -53,9 +53,12 @@ export class Game extends Phaser.Scene {
     this.load.audio("levelComplete", "assets/audio/NivelConcluido.mp3");
   }
   create() {
+    // Resetar TODAS as variáveis de estado ao iniciar/reiniciar o jogo
     Object.assign(this, {
       keysCollected: 0,
       isDead: false,
+      doorUnlocked: false,
+      levelCompleting: false,
       startTime: Date.now(),
     });
 
