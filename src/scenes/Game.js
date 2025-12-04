@@ -98,7 +98,7 @@ export class Game extends Phaser.Scene {
 
     this.player = this.physics.add.sprite(48, 48, "player_walk", 6);
     this.player.setCollideWorldBounds(true);
-    this.player.body.setSize(12, 12).setOffset(0, 0);
+    this.player.body.setSize(9, 9).setOffset(0, 0);
     this.player.setDepth(100).setScale(1);
 
     const animations = [

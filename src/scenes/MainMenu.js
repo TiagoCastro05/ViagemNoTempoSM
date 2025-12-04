@@ -82,25 +82,25 @@ export class MainMenu extends Phaser.Scene {
     const buttonY = 350;
     const buttonSpacing = 100;
 
+    // Botão Jogar
+    this.createMenuButton(960, buttonY, "JOGAR", () => this.startGame());
+
     // Botão Inicial
-    this.createMenuButton(960, buttonY, "INICIAL", () => this.showInicial());
+    this.createMenuButton(960, buttonY + buttonSpacing, "SOBRE O JOGO", () =>
+      this.showInicial()
+    );
 
     // Botão Instruções
-    this.createMenuButton(960, buttonY + buttonSpacing, "INSTRUÇÕES", () =>
+    this.createMenuButton(960, buttonY + buttonSpacing * 2, "INSTRUÇÕES", () =>
       this.showInstrucoes()
     );
 
     // Botão Configurações
     this.createMenuButton(
       960,
-      buttonY + buttonSpacing * 2,
+      buttonY + buttonSpacing * 3,
       "CONFIGURAÇÕES",
       () => this.scene.start("Settings")
-    );
-
-    // Botão Jogar
-    this.createMenuButton(960, buttonY + buttonSpacing * 3, "JOGAR", () =>
-      this.startGame()
     );
   }
 

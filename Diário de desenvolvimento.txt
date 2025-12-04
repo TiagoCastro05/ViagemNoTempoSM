@@ -185,7 +185,7 @@ Problemas:
   a) O jogador não conseguia passar de nivel depois da primeira tentativa
 
 Solução:
- a) a variavel do nivel concluido (levelCompleting) não estava a ser resetada sempre que havia uma nova tentativa.
+ a)  A variavel do nivel concluido (levelCompleting) não estava a ser resetada sempre que havia uma nova tentativa.
 
 Utilização de IA:
 -> Na criação da barra de Progresso
